@@ -150,3 +150,29 @@ func TestReOpen(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 }
+
+func TestAssignId(t *testing.T) {
+
+	//no prev assignedid
+	issue := NewIssue("01", "Title", "desc")
+	issue.AssigneeId = ""
+	new_id := "06"
+	err := issue.AssignIssue(new_id)
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+	if issue.AssigneeId != new_id {
+		t.Errorf("got %v,want %v", issue.AssigneeId, new_id)
+	}
+	//a prev assigned id
+	issue2 := NewIssue("01", "Title", "desc")
+	issue2.AssigneeId = "07"
+	new_id = "06"
+	err = issue2.AssignIssue(new_id)
+
+	if err != ErrIssueAlreadyAssigned {
+		t.Errorf("got %v,want %v", err, ErrIssueAlreadyAssigned)
+	}
+}
