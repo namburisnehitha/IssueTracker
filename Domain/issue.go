@@ -19,6 +19,7 @@ type Issue struct {
 	AssigneeId  string
 	Labels      []Label
 	Comments    []Comment
+	Activities  []Activity
 }
 
 func (i *Issue) AssignIssue(Id string) error {

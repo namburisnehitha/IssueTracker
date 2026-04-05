@@ -1,28 +1,35 @@
+package domain
 
-func TestNewIssue(t *testing.T) {
-	id := "ISS-001"
-	title := "Login broken"
-	description := "Users cannot log in"
+import (
+	"testing"
+	"time"
+)
 
-	issue := NewIssue(id, title, description)
+func TestNewActivity(t *testing.T) {
+	userid := "01"
+	issueid := "001"
+	description := "added comment"
+	action := CommentAdded
 
-	if issue.Id != id {
-		t.Errorf("got %v,want %v", issue.Id, id)
+	act := NewActivity(issueid, userid, description, action)
+
+	if act.IssueId != issueid {
+		t.Errorf("got %v,want %v", act.IssueId, issueid)
 	}
 
-	if issue.Title != title {
-		t.Errorf("got %v,want %v", issue.Title, title)
+	if act.UserId != userid {
+		t.Errorf("got %v,want %v", act.UserId, userid)
 	}
 
-	if issue.Description != description {
-		t.Errorf("got %v,want %v", issue.Description, description)
+	if act.Description != description {
+		t.Errorf("got %v,want %v", act.Description, description)
 	}
 
-	if issue.Status != StatusOpen {
-		t.Errorf("got %v,want %v", issue.Status, StatusOpen)
+	if act.Action != action {
+		t.Errorf("got %v,want %v", act.Action, action)
 	}
 
-	if issue.CreatedAt.IsZero() {
-		t.Errorf("got %v,want %v", issue.CreatedAt, time.Now())
+	if act.CreatedAt.IsZero() {
+		t.Errorf("got %v,want %v", act.CreatedAt, time.Now())
 	}
 }
