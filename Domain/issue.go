@@ -17,6 +17,7 @@ type Issue struct {
 	Status      IssueStatus
 	CreatedAt   time.Time
 	AssigneeId  string
+	Labels      []Label
 }
 
 func (i *Issue) AssignIssue(Id string) error {
