@@ -116,3 +116,37 @@ func TestClose(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 }
+
+func TestReOpen(t *testing.T) {
+	//status is in closed
+	issue := NewIssue("01", "title", "description")
+	issue.AssigneeId = "67"
+	issue.Status = StatusClosed
+	err := issue.ReOpen()
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+	if issue.Status != StatusOpen {
+		t.Errorf("got %v,want %v", issue.Status, StatusOpen)
+	}
+
+	// status is not closed
+	issue2 := NewIssue("01", "title", "description")
+	issue2.Status = StatusOpen
+	issue2.AssigneeId = "6767"
+	err = issue2.ReOpen()
+
+	if err != ErrInvalidStateTransition {
+		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
+	}
+
+	issue3 := NewIssue("01", "title", "description")
+	issue3.Status = StatusInProgress
+	err = issue3.ReOpen()
+
+	if err != ErrInvalidStateTransition {
+		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
+	}
+}
