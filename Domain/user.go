@@ -17,10 +17,6 @@ type User struct {
 	JoinedAt time.Time
 }
 
-func (u User) UserInfo() string {
-	return u.Name + "  " + string(u.Role)
-}
-
-func (u *User) ChangeRole(roles Roles) {
-	u.Role = roles
+func (u *User) ChangeRole(role Roles) {
+	u.Role = role
 }
