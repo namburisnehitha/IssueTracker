@@ -30,7 +30,7 @@ func (i *Issue) AssignIssue(Id string) error {
 	return ErrIssueAlreadyAssigned
 }
 
-func (i *Issue) Start() error {
+func (i *Issue) Start(u *User) error {
 
 	if i.Status != StatusOpen {
 		return ErrInvalidStateTransition
@@ -39,26 +39,39 @@ func (i *Issue) Start() error {
 	if i.AssigneeId == "" {
 		return ErrIssueHasNoAssignee
 	}
+	if u.Id != i.AssigneeId {
+		return ErrUnauthorizedAction
+	}
 
 	i.Status = StatusInProgress
 	return nil
 
 }
 
-func (i *Issue) Close() error {
-	if i.Status == StatusInProgress {
-		i.Status = StatusClosed
-		return nil
+func (i *Issue) Close(u *User) error {
+
+	if i.Status != StatusInProgress {
+		return ErrInvalidStateTransition
 	}
-	return ErrInvalidStateTransition
+
+	if u.Id != i.AssigneeId {
+		return ErrUnauthorizedAction
+	}
+	i.Status = StatusClosed
+	return nil
 }
 
-func (i *Issue) ReOpen() error {
-	if i.Status == StatusClosed {
-		i.Status = StatusOpen
-		return nil
+func (i *Issue) ReOpen(u *User) error {
+
+	if i.Status != StatusClosed {
+		return ErrInvalidStateTransition
 	}
-	return ErrInvalidStateTransition
+	if u.Id != i.AssigneeId {
+		return ErrUnauthorizedAction
+	}
+	i.Status = StatusOpen
+	return nil
+
 }
 
 func NewIssue(Id string, Title string, Description string) Issue {
