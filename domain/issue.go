@@ -74,12 +74,15 @@ func (i *Issue) ReOpen(u *User) error {
 
 }
 
-func NewIssue(Id string, Title string, Description string) Issue {
+func NewIssue(Id string, Title string, Description string) (Issue, error) {
+	if Title == "" {
+		return Issue{}, ErrInvalidIssueData
+	}
 	return Issue{
 		Id:          Id,
 		Title:       Title,
 		Description: Description,
 		Status:      StatusOpen,
 		CreatedAt:   time.Now(),
-	}
+	}, nil
 }

@@ -6,11 +6,21 @@ import (
 )
 
 func TestNewIssue(t *testing.T) {
+
+	id2 := "ISS-001"
+	title2 := ""
+	description2 := "no Title"
+	_, err := NewIssue(id2, title2, description2)
+
+	if err != ErrInvalidIssueData {
+		t.Errorf("got %v,want %v", err, ErrInvalidIssueData)
+	}
+
 	id := "ISS-001"
 	title := "Login broken"
 	description := "Users cannot log in"
 
-	issue := NewIssue(id, title, description)
+	issue, err := NewIssue(id, title, description)
 
 	if issue.Id != id {
 		t.Errorf("got %v,want %v", issue.Id, id)
@@ -31,6 +41,9 @@ func TestNewIssue(t *testing.T) {
 	if issue.CreatedAt.IsZero() {
 		t.Errorf("got %v,want %v", issue.CreatedAt, time.Now())
 	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
 }
 
 func TestStart(t *testing.T) {
@@ -39,9 +52,9 @@ func TestStart(t *testing.T) {
 
 	// Situation 1: open issue with assignee — should succeed
 
-	issue1 := NewIssue("001", "title", "desc")
+	issue1, err := NewIssue("001", "title", "desc")
 	issue1.AssigneeId = "user-123"
-	err := issue1.Start(user)
+	err = issue1.Start(user)
 
 	// check err is nil
 
@@ -60,7 +73,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 2: open issue, no assignee — should fail
 
-	issue2 := NewIssue("002", "title", "desc")
+	issue2, err := NewIssue("002", "title", "desc")
 	err = issue2.Start(user)
 
 	// check err is ErrIssueHasNoAssignee
@@ -77,7 +90,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 3: already in progress — should faild
 
-	issue3 := NewIssue("003", "title", "desc")
+	issue3, err := NewIssue("003", "title", "desc")
 	issue3.Status = StatusInProgress
 	t.Logf("issue3 status before Start: %v", issue3.Status)
 	err = issue3.Start(user)
@@ -89,7 +102,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 4 : Wrong user id
 
-	issue4 := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc")
 	issue4.AssigneeId = "user-123"
 	user_1 := &User{Id: "user-456"}
 	err = issue4.Start(user_1)
@@ -104,10 +117,10 @@ func TestClose(t *testing.T) {
 	user := &User{Id: "user-123"}
 
 	//status is in progress
-	issue := NewIssue("01", "title", "description")
+	issue, err := NewIssue("01", "title", "description")
 	issue.AssigneeId = "user-123"
 	issue.Status = StatusInProgress
-	err := issue.Close(user)
+	err = issue.Close(user)
 
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -118,7 +131,7 @@ func TestClose(t *testing.T) {
 	}
 
 	// status not in progress
-	issue2 := NewIssue("01", "title", "description")
+	issue2, err := NewIssue("01", "title", "description")
 	issue2.Status = StatusOpen
 	issue2.AssigneeId = "user-123"
 	err = issue2.Close(user)
@@ -127,7 +140,7 @@ func TestClose(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 
-	issue3 := NewIssue("01", "title", "description")
+	issue3, err := NewIssue("01", "title", "description")
 	issue3.Status = StatusClosed
 	err = issue3.Close(user)
 
@@ -136,7 +149,7 @@ func TestClose(t *testing.T) {
 	}
 
 	//Situation: when user is not assignee
-	issue4 := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc")
 	issue4.AssigneeId = "user-123"
 	issue4.Status = StatusInProgress
 	user_1 := &User{Id: "user-456"}
@@ -151,10 +164,10 @@ func TestClose(t *testing.T) {
 func TestReOpen(t *testing.T) {
 	user := &User{Id: "user-123"}
 	//status is in closed
-	issue := NewIssue("01", "title", "description")
+	issue, err := NewIssue("01", "title", "description")
 	issue.AssigneeId = "user-123"
 	issue.Status = StatusClosed
-	err := issue.ReOpen(user)
+	err = issue.ReOpen(user)
 
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -165,7 +178,7 @@ func TestReOpen(t *testing.T) {
 	}
 
 	// status is not closed
-	issue2 := NewIssue("01", "title", "description")
+	issue2, err := NewIssue("01", "title", "description")
 	issue2.Status = StatusOpen
 	issue2.AssigneeId = "user-123"
 	err = issue2.ReOpen(user)
@@ -174,7 +187,7 @@ func TestReOpen(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 
-	issue3 := NewIssue("01", "title", "description")
+	issue3, err := NewIssue("01", "title", "description")
 	issue3.Status = StatusInProgress
 	err = issue3.ReOpen(user)
 
@@ -182,7 +195,7 @@ func TestReOpen(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 	// when user is not assignee
-	issue4 := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc")
 	issue4.AssigneeId = "user-123"
 	user_1 := &User{Id: "user-456"}
 	issue4.Status = StatusClosed
@@ -197,10 +210,10 @@ func TestReOpen(t *testing.T) {
 func TestAssignId(t *testing.T) {
 
 	//not assigned
-	issue := NewIssue("01", "Title", "desc")
+	issue, err := NewIssue("01", "Title", "desc")
 	issue.AssigneeId = ""
 	new_id := "06"
-	err := issue.AssignIssue(new_id)
+	err = issue.AssignIssue(new_id)
 
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -210,7 +223,7 @@ func TestAssignId(t *testing.T) {
 		t.Errorf("got %v,want %v", issue.AssigneeId, new_id)
 	}
 	//already assigned
-	issue2 := NewIssue("01", "Title", "desc")
+	issue2, err := NewIssue("01", "Title", "desc")
 	issue2.AssigneeId = "07"
 	new_id = "06"
 	err = issue2.AssignIssue(new_id)
