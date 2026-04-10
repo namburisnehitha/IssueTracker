@@ -12,8 +12,10 @@ func NewIssueService(issueRepository domain.IssueRepository) IssueService {
 	}
 }
 
-func (i *IssueService) CreateIssue(Id string, Title string, Description string) error {
-	domain.NewIssue(Id, Title, Description)
-	NewIssueService(i.issueRepository)
-
+func (i *IssueService) CreateIssue(id string, title string, description string) error {
+	issue, err := domain.NewIssue(id, title, description)
+	if err != nil {
+		return err
+	}
+	return i.issueRepository.Save(issue)
 }
