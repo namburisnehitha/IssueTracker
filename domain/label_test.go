@@ -5,12 +5,23 @@ import (
 )
 
 func TestNewLabel(t *testing.T) {
+	//Invalid
+	id2 := "01"
+	name2 := ""
+	description2 := "no Title"
+	colour2 := "colour"
+	_, err := NewLabel(id2, name2, description2, colour2)
+
+	if err != ErrInvalidLabelData {
+		t.Errorf("got %v,want %v", err, ErrInvalidLabelData)
+	}
+
 	id := "01"
 	name := "bug"
 	description := "need fix"
 	colour := "red"
 
-	label := NewLabel(id, name, description, colour)
+	label, err := NewLabel(id, name, description, colour)
 
 	if label.Id != id {
 		t.Errorf("got %v,want %v", label.Id, id)
@@ -27,6 +38,10 @@ func TestNewLabel(t *testing.T) {
 	if label.Colour != colour {
 		t.Errorf("got %v,want %v", label.Colour, colour)
 	}
+
+	if err != nil {
+		t.Errorf("got %v want %v", err, nil)
+	}
 }
 
 func TestUpdateName(t *testing.T) {
@@ -36,10 +51,13 @@ func TestUpdateName(t *testing.T) {
 	colour := "red"
 	new_name := "urgent"
 
-	label := NewLabel(id, name, description, colour)
+	label, err := NewLabel(id, name, description, colour)
 	label.UpdateName(new_name)
 	if label.Name != new_name {
 		t.Errorf("got %v,want %v", label.Name, new_name)
+	}
+	if err != nil {
+		t.Errorf("got %v want %v", err, nil)
 	}
 }
 
@@ -50,9 +68,12 @@ func TestUpdateColour(t *testing.T) {
 	colour := "red"
 	new_colour := "pink"
 
-	label := NewLabel(id, name, description, colour)
+	label, err := NewLabel(id, name, description, colour)
 	label.UpdateColour(new_colour)
 	if label.Colour != new_colour {
 		t.Errorf("got %v,want %v", label.Name, new_colour)
+	}
+	if err != nil {
+		t.Errorf("got %v want %v", err, nil)
 	}
 }

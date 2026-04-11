@@ -50,4 +50,16 @@ var (
 		Code:    "INVALID_ISSUE_DATA",
 		Message: "issue data is not valid",
 	}
+	ErrInvalidLabelData = DomainError{
+		Code:    "INVALID_LABEL_DATA",
+		Message: "issue data is not valid",
+	}
+	ErrInvalidCommenteData = DomainError{
+		Code:    "INVALID_COMMENT_DATA",
+		Message: "issue data is not valid",
+	}
+	ErrInvalidActivityData = DomainError{
+		Code:    "INVALID_ACTIVITY_DATA",
+		Message: "issue data is not valid",
+	}
 )
