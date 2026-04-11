@@ -54,7 +54,7 @@ var (
 		Code:    "INVALID_LABEL_DATA",
 		Message: "issue data is not valid",
 	}
-	ErrInvalidCommenteData = DomainError{
+	ErrInvalidCommentData = DomainError{
 		Code:    "INVALID_COMMENT_DATA",
 		Message: "issue data is not valid",
 	}

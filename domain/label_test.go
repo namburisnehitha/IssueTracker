@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewLabel(t *testing.T) {
-	//Invalid
+	//Invalid data
 	id2 := "01"
 	name2 := ""
 	description2 := "no Title"
