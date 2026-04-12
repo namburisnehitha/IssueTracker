@@ -114,3 +114,18 @@ func TestGetByStatus(t *testing.T) {
 		t.Errorf("got %v,want %v", err, nil)
 	}
 }
+
+func TestGetByTitle(t *testing.T) {
+	title := "test"
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	repo.issues["01"] = domain.Issue{Id: "01", Title: title}
+	issue, err := service.GetByTitle(title)
+
+	if issue[0].Title != title {
+		t.Errorf("got %v,want %v", issue[0].Title, title)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+}
