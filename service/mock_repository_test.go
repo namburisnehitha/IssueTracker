@@ -215,3 +215,18 @@ func TestDeleteIssue(t *testing.T) {
 		t.Errorf("got %v,want %v", err, nil)
 	}
 }
+
+func TestListIssue(t *testing.T) {
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service1 := NewIssueService(repo)
+	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: domain.StatusOpen}
+	repo.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: domain.StatusOpen}
+	repo.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: domain.StatusOpen}
+	issues, err := service1.ListIssues()
+	if len(issues) != 3 {
+		t.Errorf("got %v, want %v", len(issues), 3)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+}
