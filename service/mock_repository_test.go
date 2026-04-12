@@ -101,6 +101,7 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetByStatus(t *testing.T) {
+	//only one issue
 	status := domain.StatusOpen
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -113,6 +114,30 @@ func TestGetByStatus(t *testing.T) {
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
 	}
+
+	//mulitple issues(actual use case)
+	status0 := domain.StatusOpen
+	status1 := domain.StatusOpen
+	status2 := domain.StatusClosed
+	status3 := domain.StatusOpen
+	repo1 := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service1 := NewIssueService(repo1)
+	repo1.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status1}
+	repo1.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: status2}
+	repo1.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: status3}
+	issues, err := service1.GetByStatus(status0)
+	for _, issue := range issues {
+		if issue.Status != status0 {
+			t.Errorf("got %v,want %v", issue.Status, status)
+		}
+	}
+	if len(issues) != 2 {
+		t.Errorf("got %v, want %v", len(issues), 2)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
 }
 
 func TestGetByTitle(t *testing.T) {
@@ -128,4 +153,8 @@ func TestGetByTitle(t *testing.T) {
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
 	}
+}
+
+func TestUpdateIssue(t *testing.T) {
+
 }
