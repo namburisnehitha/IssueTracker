@@ -99,3 +99,18 @@ func TestGetById(t *testing.T) {
 	}
 
 }
+
+func TestGetByStatus(t *testing.T) {
+	status := domain.StatusOpen
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status}
+	issue, err := service.GetByStatus(status)
+
+	if issue[0].Status != status {
+		t.Errorf("got %v,want %v", issue[0].Status, status)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+}
