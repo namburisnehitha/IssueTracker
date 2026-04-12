@@ -1,6 +1,8 @@
 package service
 
 import (
+	"testing"
+
 	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
@@ -54,4 +56,46 @@ func (m *MockIssueRepository) ListIssues() ([]domain.Issue, error) {
 		result = append(result, issue)
 	}
 	return result, nil
+}
+
+func TestCreateIssue(t *testing.T) {
+	id := "01"
+	title := "Create Isuue"
+	description := "create the issue"
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	err := service.CreateIssue(id, title, description)
+	saved := repo.issues[id]
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+	if saved.Id != id {
+		t.Errorf("got %v,want %v", saved.Id, id)
+	}
+
+	if saved.Title != title {
+		t.Errorf("got %v,want %v", saved.Title, title)
+	}
+	if saved.Description != description {
+		t.Errorf("got %v,want %v", saved.Description, description)
+	}
+}
+
+func TestGetById(t *testing.T) {
+	id := "01"
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	repo.issues[id] = domain.Issue{Id: id, Title: "test"}
+	issue, err := service.GetById(id)
+
+	if issue.Id != id {
+		t.Errorf("got %v,want %v", issue.Id, id)
+	}
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
 }
