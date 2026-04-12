@@ -181,5 +181,37 @@ func TestGetByTitle(t *testing.T) {
 }
 
 func TestUpdateIssue(t *testing.T) {
+	title := "new"
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	repo.issues["01"] = domain.Issue{Id: "01", Title: "old"}
+	issue := domain.Issue{Id: "01", Title: title}
+	err := service.UpdateIssue(issue)
+	updated := repo.issues["01"]
 
+	if updated.Title != title {
+		t.Errorf("got %v,want %v", updated.Title, title)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+}
+
+func TestDeleteIssue(t *testing.T) {
+	id := "01"
+	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+	service := NewIssueService(repo)
+	repo.issues[id] = domain.Issue{Id: id, Title: "old"}
+	issue := domain.Issue{Id: id, Title: "new"}
+	err := service.DeleteIssue(issue)
+
+	_, exists := repo.issues["01"]
+
+	if exists {
+		t.Errorf("issue was not deleted")
+	}
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
 }
