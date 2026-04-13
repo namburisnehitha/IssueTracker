@@ -83,7 +83,7 @@ func TestCreateIssue(t *testing.T) {
 	}
 }
 
-func TestGetById(t *testing.T) {
+func TestIsssueGetById(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -100,7 +100,7 @@ func TestGetById(t *testing.T) {
 
 }
 
-func TestGetByStatus(t *testing.T) {
+func TestIssueGetByStatus(t *testing.T) {
 	//only one issue
 	status := domain.StatusOpen
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
@@ -140,7 +140,7 @@ func TestGetByStatus(t *testing.T) {
 
 }
 
-func TestGetByTitle(t *testing.T) {
+func TestIssueGetByTitle(t *testing.T) {
 	//with one issue
 	title := "test"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
@@ -180,7 +180,7 @@ func TestGetByTitle(t *testing.T) {
 
 }
 
-func TestUpdateIssue(t *testing.T) {
+func TestIssueUpdateIssue(t *testing.T) {
 	title := "new"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -197,7 +197,7 @@ func TestUpdateIssue(t *testing.T) {
 	}
 }
 
-func TestDeleteIssue(t *testing.T) {
+func TestIssueDeleteIssue(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -216,7 +216,7 @@ func TestDeleteIssue(t *testing.T) {
 	}
 }
 
-func TestListIssue(t *testing.T) {
+func TestIssueListIssue(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service1 := NewIssueService(repo)
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: domain.StatusOpen}
