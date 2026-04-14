@@ -52,14 +52,14 @@ var (
 	}
 	ErrInvalidLabelData = DomainError{
 		Code:    "INVALID_LABEL_DATA",
-		Message: "issue data is not valid",
+		Message: "label data is not valid",
 	}
 	ErrInvalidCommentData = DomainError{
 		Code:    "INVALID_COMMENT_DATA",
-		Message: "issue data is not valid",
+		Message: "comment data is not valid",
 	}
 	ErrInvalidActivityData = DomainError{
 		Code:    "INVALID_ACTIVITY_DATA",
-		Message: "issue data is not valid",
+		Message: "activity data is not valid",
 	}
 )
