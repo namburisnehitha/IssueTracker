@@ -13,7 +13,7 @@ type IssueRepository interface {
 type LabelRepository interface {
 	Save(label Label) error
 	GetById(id string) (Label, error)
-	GetByTitle(id string) (Label, error)
+	GetByName(id string) (Label, error)
 	GetByColour(colour string) ([]Label, error)
 	UpdateLabel(label Label) error
 	DeleteLabel(label Label) error
