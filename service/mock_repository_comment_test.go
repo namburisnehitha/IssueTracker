@@ -84,3 +84,128 @@ func TestCreateNewComment(t *testing.T) {
 		t.Errorf("got %v,want %v", saved.Id, id)
 	}
 }
+
+func TestCommentGetById(t *testing.T) {
+	id := "01"
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments[id] = domain.Comment{Id: id}
+	comment, err := service.GetById(id)
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+	if comment.Id != id {
+		t.Errorf("got %v,want %v", comment.Id, id)
+	}
+}
+
+func TestCommentGetByIssueId(t *testing.T) {
+	issueid1 := "10"
+	issueid2 := "10"
+	issueid3 := "30"
+
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments["01"] = domain.Comment{Id: "01", IssueId: issueid1}
+	repo.comments["02"] = domain.Comment{Id: "02", IssueId: issueid2}
+	repo.comments["03"] = domain.Comment{Id: "03", IssueId: issueid3}
+	comments, err := service.GetByIssueId(issueid1)
+
+	for _, comment := range comments {
+		if comment.IssueId != issueid1 {
+			t.Errorf("got %v,want %v", comment.IssueId, issueid1)
+		}
+	}
+
+	if len(comments) != 2 {
+		t.Errorf("got %v,want %v", len(comments), 2)
+	}
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+}
+
+func TestCommentGetByUserId(t *testing.T) {
+	userid1 := "10"
+	userid2 := "10"
+	userid3 := "30"
+
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments["01"] = domain.Comment{Id: "01", UserId: userid1}
+	repo.comments["02"] = domain.Comment{Id: "02", UserId: userid2}
+	repo.comments["03"] = domain.Comment{Id: "03", UserId: userid3}
+	comments, err := service.GetByUserId(userid1)
+
+	for _, comment := range comments {
+		if comment.UserId != userid1 {
+			t.Errorf("got %v,want %v", comment.UserId, userid1)
+		}
+	}
+
+	if len(comments) != 2 {
+		t.Errorf("got %v,want %v", len(comments), 2)
+	}
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+}
+
+func TestUpdateComment(t *testing.T) {
+	content := "New Comment"
+	id := "1"
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments[id] = domain.Comment{Id: id, Content: "old comment"}
+	comment := domain.Comment{Id: id, Content: content}
+	err := service.UpdateComment(comment)
+	updated := repo.comments[id]
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+	if updated.Content != content {
+		t.Errorf("got %v,want %v", updated.Content, content)
+	}
+
+}
+
+func TestDeleteComment(t *testing.T) {
+	id := "01"
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments[id] = domain.Comment{Id: id, Content: "comment"}
+	comment := domain.Comment{Id: id, Content: "comment"}
+	err := service.DeleteComment(comment)
+	_, exists := repo.comments["01"]
+
+	if exists {
+		t.Errorf("comment was not deleted")
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+}
+
+func TestListComments(t *testing.T) {
+
+	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
+	service := NewCommentService(repo)
+	repo.comments["01"] = domain.Comment{Id: "01", Content: "comment"}
+	repo.comments["02"] = domain.Comment{Id: "02", Content: "comment"}
+	repo.comments["03"] = domain.Comment{Id: "03", Content: "comment"}
+	comments, err := service.CommentList()
+
+	if len(comments) != 3 {
+		t.Errorf("got %v,want %v", len(comments), 3)
+	}
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+}

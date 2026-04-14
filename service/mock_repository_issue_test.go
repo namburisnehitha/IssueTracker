@@ -180,7 +180,7 @@ func TestIssueGetByTitle(t *testing.T) {
 
 }
 
-func TestIssueUpdateIssue(t *testing.T) {
+func TestUpdateIssue(t *testing.T) {
 	title := "new"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -197,7 +197,7 @@ func TestIssueUpdateIssue(t *testing.T) {
 	}
 }
 
-func TestIssueDeleteIssue(t *testing.T) {
+func TestDeleteIssue(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
@@ -216,7 +216,7 @@ func TestIssueDeleteIssue(t *testing.T) {
 	}
 }
 
-func TestIssueListIssue(t *testing.T) {
+func TestListIssue(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service1 := NewIssueService(repo)
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: domain.StatusOpen}
