@@ -17,7 +17,7 @@ type LabelRepository interface {
 	GetByColour(colour string) ([]Label, error)
 	UpdateLabel(label Label) error
 	DeleteLabel(label Label) error
-	ListLabels() ([]Label, error)
+	LabelList() ([]Label, error)
 }
 
 type CommentRepository interface {
