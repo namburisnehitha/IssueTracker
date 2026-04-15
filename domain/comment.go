@@ -9,6 +9,7 @@ type Comment struct {
 	UserId    string
 	Content   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 	Id        string
 }
 
@@ -21,6 +22,7 @@ func NewComment(IssueId string, UserId string, Content string, Id string) (Comme
 		UserId:    UserId,
 		Content:   Content,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 		Id:        Id,
 	}, nil
 }

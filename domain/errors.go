@@ -62,4 +62,8 @@ var (
 		Code:    "INVALID_ACTIVITY_DATA",
 		Message: "activity data is not valid",
 	}
+	ErrInvalidUserData = DomainError{
+		Code:    "INVALID_USER_DATA",
+		Message: "user data is not valid",
+	}
 )

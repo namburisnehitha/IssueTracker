@@ -11,10 +11,24 @@ const (
 )
 
 type User struct {
-	Name     string
-	Role     Roles
-	Id       string
-	JoinedAt time.Time
+	Name          string
+	Role          Roles
+	Id            string
+	JoinedAt      time.Time
+	ChangedRoleAt time.Time
+}
+
+func NewUser(name string, role Roles, id string) (User, error) {
+	if name == "" {
+		return User{}, ErrInvalidUserData
+	}
+	return User{
+		Name:          name,
+		Role:          role,
+		Id:            id,
+		JoinedAt:      time.Now(),
+		ChangedRoleAt: time.Now(),
+	}, nil
 }
 
 func (u *User) ChangeRole(role Roles) {
