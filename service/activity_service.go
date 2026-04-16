@@ -12,10 +12,14 @@ func NewActivityService(activityRepository domain.ActivityRepository) ActivitySe
 	}
 }
 
-func (a *ActivityService) CreateActivity(issueid string, userid string, description string, action domain.ActivityType) error {
-	activity := domain.NewActivity(issueid, userid, description, action)
+func (a *ActivityService) CreateActivity(id string, issueid string, userid string, description string, action domain.ActivityType) error {
+	activity := domain.NewActivity(id, issueid, userid, description, action)
 	return a.activityRepository.Save(activity)
 
+}
+
+func (a *ActivityService) GetById(id string) (domain.Activity, error) {
+	return a.activityRepository.GetById(id)
 }
 
 func (a *ActivityService) GetByUserId(userid string) ([]domain.Activity, error) {

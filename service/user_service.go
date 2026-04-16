@@ -12,11 +12,19 @@ func NewUserService(userRepository domain.UserRepository) UserService {
 	}
 }
 
+func (u *UserService) CreateUser(id string, name string, role domain.Roles) error {
+	user, err := domain.NewUser(name, role, id)
+	if err != nil {
+		return err
+	}
+	return u.userRepository.Save(user)
+}
+
 func (u *UserService) GetById(id string) (domain.User, error) {
 	return u.userRepository.GetById(id)
 }
 
-func (u *UserService) GetByName(name string) (domain.User, error) {
+func (u *UserService) GetByName(name string) ([]domain.User, error) {
 	return u.userRepository.GetByName(name)
 }
 

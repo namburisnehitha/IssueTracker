@@ -24,8 +24,8 @@ func (l *LabelService) GetById(id string) (domain.Label, error) {
 	return l.labelRepository.GetById(id)
 }
 
-func (l *LabelService) GetByTitle(title string) (domain.Label, error) {
-	return l.labelRepository.GetByTitle(title)
+func (l *LabelService) GetByName(name string) (domain.Label, error) {
+	return l.labelRepository.GetByName(name)
 }
 
 func (l *LabelService) GetByColour(colour string) ([]domain.Label, error) {
@@ -40,6 +40,6 @@ func (l *LabelService) DeleteLabel(label domain.Label) error {
 	return l.labelRepository.DeleteLabel(label)
 }
 
-func (l *LabelService) ListLabel() ([]domain.Label, error) {
-	return l.labelRepository.ListLabels()
+func (l *LabelService) LabelList() ([]domain.Label, error) {
+	return l.labelRepository.LabelList()
 }

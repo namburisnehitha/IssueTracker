@@ -201,8 +201,8 @@ func TestDeleteIssue(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
-	repo.issues[id] = domain.Issue{Id: id, Title: "old"}
-	issue := domain.Issue{Id: id, Title: "new"}
+	repo.issues[id] = domain.Issue{Id: id}
+	issue := domain.Issue{Id: id}
 	err := service.DeleteIssue(issue)
 
 	_, exists := repo.issues["01"]

@@ -32,6 +32,7 @@ type CommentRepository interface {
 
 type ActivityRepository interface {
 	Save(activity Activity) error
+	GetById(id string) (Activity, error)
 	GetByUserId(userid string) ([]Activity, error)
 	GetByIssueId(issueid string) ([]Activity, error)
 	GetByAction(action ActivityType) ([]Activity, error)
@@ -40,10 +41,10 @@ type ActivityRepository interface {
 
 type UserRepository interface {
 	Save(user User) error
-	UpdateUser(user User) error
-	GetByName(name string) (User, error)
+	GetByName(name string) ([]User, error)
 	GetById(id string) (User, error)
 	GetByRole(role Roles) ([]User, error)
+	UpdateUser(user User) error
 	DeleteUser(user User) error
 	UserList() ([]User, error)
 }

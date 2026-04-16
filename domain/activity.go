@@ -12,6 +12,7 @@ const (
 )
 
 type Activity struct {
+	Id          string
 	UserId      string
 	IssueId     string
 	Description string
@@ -19,8 +20,9 @@ type Activity struct {
 	Action      ActivityType
 }
 
-func NewActivity(IssueId string, UserId string, Description string, Action ActivityType) Activity {
+func NewActivity(Id string, IssueId string, UserId string, Description string, Action ActivityType) Activity {
 	return Activity{
+		Id:          Id,
 		IssueId:     IssueId,
 		UserId:      UserId,
 		Description: Description,

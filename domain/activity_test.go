@@ -6,12 +6,17 @@ import (
 )
 
 func TestNewActivity(t *testing.T) {
+	id := "1"
 	userid := "01"
 	issueid := "001"
 	description := "added comment"
 	action := CommentAdded
 
-	act := NewActivity(issueid, userid, description, action)
+	act := NewActivity(id, issueid, userid, description, action)
+
+	if act.Id != id {
+		t.Errorf("got %v,want %v", act.Id, id)
+	}
 
 	if act.IssueId != issueid {
 		t.Errorf("got %v,want %v", act.IssueId, issueid)
