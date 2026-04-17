@@ -6,8 +6,8 @@ type IssueService struct {
 	issueRepository domain.IssueRepository
 }
 
-func NewIssueService(issueRepository domain.IssueRepository) IssueService {
-	return IssueService{
+func NewIssueService(issueRepository domain.IssueRepository) *IssueService {
+	return &IssueService{
 		issueRepository: issueRepository,
 	}
 }

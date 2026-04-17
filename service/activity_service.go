@@ -6,8 +6,8 @@ type ActivityService struct {
 	activityRepository domain.ActivityRepository
 }
 
-func NewActivityService(activityRepository domain.ActivityRepository) ActivityService {
-	return ActivityService{
+func NewActivityService(activityRepository domain.ActivityRepository) *ActivityService {
+	return &ActivityService{
 		activityRepository: activityRepository,
 	}
 }

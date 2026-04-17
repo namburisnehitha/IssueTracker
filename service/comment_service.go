@@ -8,8 +8,8 @@ type CommentService struct {
 	commentRepository domain.CommentRepository
 }
 
-func NewCommentService(commentRepository domain.CommentRepository) CommentService {
-	return CommentService{
+func NewCommentService(commentRepository domain.CommentRepository) *CommentService {
+	return &CommentService{
 		commentRepository: commentRepository,
 	}
 }

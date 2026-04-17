@@ -6,8 +6,8 @@ type LabelService struct {
 	labelRepository domain.LabelRepository
 }
 
-func NewLabelService(labelrepository domain.LabelRepository) LabelService {
-	return LabelService{
+func NewLabelService(labelrepository domain.LabelRepository) *LabelService {
+	return &LabelService{
 		labelRepository: labelrepository,
 	}
 }
