@@ -53,6 +53,11 @@ func TestStart(t *testing.T) {
 	// Situation 1: open issue with assignee — should succeed
 
 	issue1, err := NewIssue("001", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue1.AssigneeId = "user-123"
 	err = issue1.Start(user)
 
@@ -74,6 +79,11 @@ func TestStart(t *testing.T) {
 	// Situation 2: open issue, no assignee — should fail
 
 	issue2, err := NewIssue("002", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	err = issue2.Start(user)
 
 	// check err is ErrIssueHasNoAssignee
@@ -91,6 +101,11 @@ func TestStart(t *testing.T) {
 	// Situation 3: already in progress — should faild
 
 	issue3, err := NewIssue("003", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue3.Status = StatusInProgress
 	t.Logf("issue3 status before Start: %v", issue3.Status)
 	err = issue3.Start(user)
@@ -103,6 +118,11 @@ func TestStart(t *testing.T) {
 	// Situation 4 : Wrong user id
 
 	issue4, err := NewIssue("004", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue4.AssigneeId = "user-123"
 	user_1 := &User{Id: "user-456"}
 	err = issue4.Start(user_1)
@@ -118,6 +138,11 @@ func TestClose(t *testing.T) {
 
 	//status is in progress
 	issue, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue.AssigneeId = "user-123"
 	issue.Status = StatusInProgress
 	err = issue.Close(user)
@@ -132,6 +157,11 @@ func TestClose(t *testing.T) {
 
 	// status not in progress
 	issue2, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue2.Status = StatusOpen
 	issue2.AssigneeId = "user-123"
 	err = issue2.Close(user)
@@ -141,6 +171,11 @@ func TestClose(t *testing.T) {
 	}
 
 	issue3, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue3.Status = StatusClosed
 	err = issue3.Close(user)
 
@@ -150,6 +185,11 @@ func TestClose(t *testing.T) {
 
 	//Situation: when user is not assignee
 	issue4, err := NewIssue("004", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue4.AssigneeId = "user-123"
 	issue4.Status = StatusInProgress
 	user_1 := &User{Id: "user-456"}
@@ -165,6 +205,11 @@ func TestReOpen(t *testing.T) {
 	user := &User{Id: "user-123"}
 	//status is in closed
 	issue, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue.AssigneeId = "user-123"
 	issue.Status = StatusClosed
 	err = issue.ReOpen(user)
@@ -179,6 +224,11 @@ func TestReOpen(t *testing.T) {
 
 	// status is not closed
 	issue2, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue2.Status = StatusOpen
 	issue2.AssigneeId = "user-123"
 	err = issue2.ReOpen(user)
@@ -188,6 +238,11 @@ func TestReOpen(t *testing.T) {
 	}
 
 	issue3, err := NewIssue("01", "title", "description")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue3.Status = StatusInProgress
 	err = issue3.ReOpen(user)
 
@@ -196,6 +251,11 @@ func TestReOpen(t *testing.T) {
 	}
 	// when user is not assignee
 	issue4, err := NewIssue("004", "title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue4.AssigneeId = "user-123"
 	user_1 := &User{Id: "user-456"}
 	issue4.Status = StatusClosed
@@ -211,6 +271,11 @@ func TestAssignId(t *testing.T) {
 
 	//not assigned
 	issue, err := NewIssue("01", "Title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue.AssigneeId = ""
 	new_id := "06"
 	err = issue.AssignIssue(new_id)
@@ -224,6 +289,11 @@ func TestAssignId(t *testing.T) {
 	}
 	//already assigned
 	issue2, err := NewIssue("01", "Title", "desc")
+
+	if err != nil {
+		t.Fatalf("failed to create issue: %v", err)
+	}
+
 	issue2.AssigneeId = "07"
 	new_id = "06"
 	err = issue2.AssignIssue(new_id)

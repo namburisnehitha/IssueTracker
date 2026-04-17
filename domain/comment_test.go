@@ -12,7 +12,7 @@ func TestNewComment(t *testing.T) {
 	_, err := NewComment(issueid2, UserId2, content2, id2)
 
 	if err != ErrInvalidCommentData {
-		t.Errorf("got %v,want %v", err, ErrInvalidCommentData)
+		t.Fatalf("got %v,want %v", ErrInvalidCommentData, err)
 	}
 
 	issueid := "01"
@@ -21,6 +21,10 @@ func TestNewComment(t *testing.T) {
 	id := "001"
 
 	comment, err := NewComment(issueid, UserId, content, id)
+
+	if err != nil {
+		t.Fatalf("failed to create comment: %v", err)
+	}
 
 	if comment.IssueId != issueid {
 		t.Errorf("got %v,want %v", comment.IssueId, issueid)
@@ -34,7 +38,5 @@ func TestNewComment(t *testing.T) {
 	if comment.Id != id {
 		t.Errorf("got %v,want %v", comment.Id, id)
 	}
-	if err != nil {
-		t.Errorf("got %v,want %v", err, nil)
-	}
+
 }

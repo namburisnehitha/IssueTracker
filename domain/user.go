@@ -27,10 +27,11 @@ func NewUser(Name string, role Roles, id string) (User, error) {
 		Role:          role,
 		Id:            id,
 		JoinedAt:      time.Now(),
-		ChangedRoleAt: time.Now(),
+		ChangedRoleAt: time.Time{},
 	}, nil
 }
 
 func (u *User) ChangeRole(role Roles) {
 	u.Role = role
+	u.ChangedRoleAt = time.Now()
 }
