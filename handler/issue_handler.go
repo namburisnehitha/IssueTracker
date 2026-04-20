@@ -18,9 +18,9 @@ type IssueHandler struct {
 	issueService *service.IssueService
 }
 
-func NewIssueHandler(issueservice *service.IssueService) *IssueHandler {
+func NewIssueHandler(issueService *service.IssueService) *IssueHandler {
 	return &IssueHandler{
-		issueService: issueservice,
+		issueService: issueService,
 	}
 }
 
