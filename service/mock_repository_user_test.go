@@ -61,10 +61,9 @@ func (m *MockUserRepository) UserList() ([]domain.User, error) {
 func TestCreateUser(t *testing.T) {
 	id := "01"
 	name := "user"
-	role := domain.RoleAdmin
 	repo := &MockUserRepository{users: map[string]domain.User{}}
 	service := NewUserService(repo)
-	err := service.CreateUser(id, name, role)
+	err := service.CreateUser(name, id)
 	saved := repo.users[id]
 
 	if err != nil {
@@ -77,10 +76,6 @@ func TestCreateUser(t *testing.T) {
 
 	if saved.Name != name {
 		t.Errorf("got %v,want %v", saved.Name, name)
-	}
-
-	if saved.Role != role {
-		t.Errorf("got %v,want %v", saved.Role, role)
 	}
 
 }

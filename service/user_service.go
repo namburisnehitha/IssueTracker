@@ -12,8 +12,8 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 	}
 }
 
-func (u *UserService) CreateUser(id string, name string, role domain.Roles) error {
-	user, err := domain.NewUser(name, role, id)
+func (u *UserService) CreateUser(name string, id string) error {
+	user, err := domain.NewUser(name, id)
 	if err != nil {
 		return err
 	}
