@@ -18,13 +18,13 @@ type User struct {
 	ChangedRoleAt time.Time
 }
 
-func NewUser(Name string, role Roles, id string) (User, error) {
+func NewUser(Name string, id string) (User, error) {
 	if Name == "" {
 		return User{}, ErrInvalidUserData
 	}
 	return User{
 		Name:          Name,
-		Role:          role,
+		Role:          RoleDeveloper,
 		Id:            id,
 		JoinedAt:      time.Now(),
 		ChangedRoleAt: time.Time{},
