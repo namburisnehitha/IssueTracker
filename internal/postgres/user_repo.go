@@ -47,3 +47,22 @@ func (ur *PostgresUsersRepository) GetByName(name string) ([]domain.User, error)
 	}
 	return users, err
 }
+
+func (ur *PostgresUsersRepository) GetByRole(role domain.Roles) ([]domain.User, error) {
+	var users []domain.User
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users WHERE user_role =$1`
+	rows, err := ur.db.Query(query, role)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var u domain.User
+		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, u)
+	}
+	return users, err
+}
