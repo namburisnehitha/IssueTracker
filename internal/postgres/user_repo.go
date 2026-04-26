@@ -77,3 +77,22 @@ func (ur *PostgresUsersRepository) DeleteUser(user domain.User) error {
 	_, err := ur.db.Exec(query, user.Id)
 	return err
 }
+
+func (ur *PostgresUsersRepository) UserList() ([]domain.User, error) {
+	var users []domain.User
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users `
+	rows, err := ur.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var u domain.User
+		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, u)
+	}
+	return users, err
+}
