@@ -25,7 +25,7 @@ func NewLabelHandler(labelSevice *service.LabelService) *LabelHandler {
 	}
 }
 
-func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r http.Request) {
+func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
 
 	var lr CreateLabelRequest
 	err := json.NewDecoder(r.Body).Decode(&lr)
@@ -51,6 +51,7 @@ func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, label)
@@ -63,6 +64,7 @@ func (l *LabelHandler) GetByName(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, label)
@@ -75,6 +77,7 @@ func (l *LabelHandler) GetByColour(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, label)
@@ -87,6 +90,7 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	id := chi.URLParam(r, "id")
@@ -94,6 +98,7 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	label.Colour = lr.Colour
@@ -103,6 +108,7 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, label)
@@ -115,12 +121,14 @@ func (l *LabelHandler) DeleteLabel(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	err = l.labelService.DeleteLabel(label)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
@@ -132,6 +140,7 @@ func (l *LabelHandler) LabelList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, labels)

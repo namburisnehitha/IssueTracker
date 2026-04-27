@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/namburisnehitha/IssueTracker/domain"
 	"github.com/namburisnehitha/IssueTracker/service"
 )
 
@@ -30,12 +31,14 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	err = u.userservice.CreateUser(ur.Id, ur.Name)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusCreated, nil)
@@ -48,6 +51,7 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, user)
@@ -56,10 +60,11 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 func (u *UserHandler) GetByName(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
-	user, err := u.userservice.GetById(name)
+	user, err := u.userservice.GetByName(name)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, user)
@@ -68,10 +73,11 @@ func (u *UserHandler) GetByName(w http.ResponseWriter, r *http.Request) {
 func (u *UserHandler) GetByRole(w http.ResponseWriter, r *http.Request) {
 
 	role := r.URL.Query().Get("role")
-	user, err := u.userservice.GetById(role)
+	user, err := u.userservice.GetByRole(domain.Roles(role))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, user)
@@ -87,6 +93,7 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	user.Name = ur.Name
@@ -95,6 +102,7 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, user)
@@ -108,12 +116,14 @@ func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	err = u.userservice.DeleteUser(user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
@@ -125,6 +135,7 @@ func (u *UserHandler) UserList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, users)

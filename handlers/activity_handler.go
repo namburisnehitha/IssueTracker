@@ -34,12 +34,14 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	err = a.activityService.CreateActivity(ar.Id, ar.IssueId, ar.UserId, ar.Description, ar.Action)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusCreated, nil)
@@ -52,6 +54,7 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, activity)
@@ -64,6 +67,7 @@ func (a *ActivityHandler) GetByUserId(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, activity)
@@ -72,10 +76,11 @@ func (a *ActivityHandler) GetByUserId(w http.ResponseWriter, r *http.Request) {
 func (a *ActivityHandler) GetByIssueId(w http.ResponseWriter, r *http.Request) {
 
 	issueid := r.URL.Query().Get("issueid")
-	activity, err := a.activityService.GetByUserId(issueid)
+	activity, err := a.activityService.GetByIssueId(issueid)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, activity)
@@ -84,10 +89,11 @@ func (a *ActivityHandler) GetByIssueId(w http.ResponseWriter, r *http.Request) {
 func (a *ActivityHandler) GetByAction(w http.ResponseWriter, r *http.Request) {
 
 	action := r.URL.Query().Get("action")
-	activity, err := a.activityService.GetByUserId(action)
+	activity, err := a.activityService.GetByAction(domain.ActivityType(action))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, activity)
@@ -98,6 +104,7 @@ func (a *ActivityHandler) ActivityList(w http.ResponseWriter, r *http.Request) {
 	activities, err := a.activityService.ActivityList()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, activities)
