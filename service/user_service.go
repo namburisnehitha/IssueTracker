@@ -1,6 +1,9 @@
 package service
 
-import "github.com/namburisnehitha/IssueTracker/domain"
+import (
+	"github.com/google/uuid"
+	"github.com/namburisnehitha/IssueTracker/domain"
+)
 
 type UserService struct {
 	userRepository domain.UserRepository
@@ -12,12 +15,13 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 	}
 }
 
-func (u *UserService) CreateUser(name string, id string) error {
+func (u *UserService) CreateUser(name string) (string, error) {
+	id := uuid.New().String()
 	user, err := domain.NewUser(name, id)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return u.userRepository.Save(user)
+	return id, u.userRepository.Save(user)
 }
 
 func (u *UserService) GetById(id string) (domain.User, error) {

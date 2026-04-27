@@ -34,14 +34,14 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = u.userservice.CreateUser(ur.Id, ur.Name)
+	ur.Id, err = u.userservice.CreateUser(ur.Name)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, nil)
+	writeJSON(w, http.StatusCreated, ur.Id)
 }
 
 func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
