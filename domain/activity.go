@@ -20,7 +20,11 @@ type Activity struct {
 	Action      ActivityType
 }
 
-func NewActivity(Id string, IssueId string, UserId string, Description string, Action ActivityType) Activity {
+func NewActivity(Id string, IssueId string, UserId string, Description string, Action ActivityType) (Activity, error) {
+
+	if Description == "" {
+		return Activity{}, ErrInvalidActivityData
+	}
 	return Activity{
 		Id:          Id,
 		IssueId:     IssueId,
@@ -28,5 +32,5 @@ func NewActivity(Id string, IssueId string, UserId string, Description string, A
 		Description: Description,
 		Action:      Action,
 		CreatedAt:   time.Now(),
-	}
+	}, nil
 }

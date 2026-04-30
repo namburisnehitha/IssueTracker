@@ -12,7 +12,11 @@ func TestNewActivity(t *testing.T) {
 	description := "added comment"
 	action := CommentAdded
 
-	act := NewActivity(id, issueid, userid, description, action)
+	act, err := NewActivity(id, issueid, userid, description, action)
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
 
 	if act.Id != id {
 		t.Errorf("got %v,want %v", act.Id, id)
