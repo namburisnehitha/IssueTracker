@@ -34,14 +34,14 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.commentService.CreateComment(cr.IssueId, cr.UserId, cr.Content, cr.Id)
+	cr.Id, err = c.commentService.CreateComment(cr.IssueId, cr.UserId, cr.Content)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, nil)
+	writeJSON(w, http.StatusCreated, cr.Id)
 
 }
 

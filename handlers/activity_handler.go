@@ -37,7 +37,7 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = a.activityService.CreateActivity(ar.Id, ar.IssueId, ar.UserId, ar.Description, ar.Action)
+	ar.Id, err = a.activityService.CreateActivity(ar.IssueId, ar.UserId, ar.Description, ar.Action)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

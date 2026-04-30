@@ -88,6 +88,10 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var ur CreateUserRequest
 	err := json.NewDecoder(r.Body).Decode(&ur)
 
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
 	id := chi.URLParam(r, "id")
 	user, err := u.userservice.GetById(id)
 

@@ -34,14 +34,14 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = i.issueService.CreateIssue(ir.Id, ir.Title, ir.Description)
+	ir.Id, err = i.issueService.CreateIssue(ir.Title, ir.Description)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, nil)
+	writeJSON(w, http.StatusCreated, ir.Id)
 
 }
 

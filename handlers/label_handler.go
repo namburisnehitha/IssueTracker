@@ -35,7 +35,7 @@ func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = l.labelService.CreateLabel(lr.Id, lr.Name, lr.Description, lr.Colour)
+	lr.Id, err = l.labelService.CreateLabel(lr.Name, lr.Description, lr.Colour)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
