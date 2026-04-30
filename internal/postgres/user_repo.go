@@ -40,7 +40,7 @@ func (ur *PostgresUsersRepository) GetByName(name string) ([]domain.User, error)
 		var u domain.User
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
 		if err != nil {
-			return users, err
+			return nil, err
 		}
 		users = append(users, u)
 	}
@@ -59,7 +59,7 @@ func (ur *PostgresUsersRepository) GetByRole(role domain.Roles) ([]domain.User, 
 		var u domain.User
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
 		if err != nil {
-			return users, err
+			return nil, err
 		}
 		users = append(users, u)
 	}
@@ -90,7 +90,7 @@ func (ur *PostgresUsersRepository) UserList() ([]domain.User, error) {
 		var u domain.User
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
 		if err != nil {
-			return users, err
+			return nil, err
 		}
 		users = append(users, u)
 	}
