@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
@@ -14,12 +15,13 @@ func NewCommentService(commentRepository domain.CommentRepository) *CommentServi
 	}
 }
 
-func (c *CommentService) CreateComment(issueid string, userid string, content string, id string) error {
+func (c *CommentService) CreateComment(issueid string, userid string, content string) (string, error) {
+	id := uuid.New().String()
 	comment, err := domain.NewComment(issueid, userid, content, id)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return c.commentRepository.Save(comment)
+	return id, c.commentRepository.Save(comment)
 }
 
 func (c *CommentService) GetByIssueId(issueid string) ([]domain.Comment, error) {

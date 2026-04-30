@@ -1,6 +1,9 @@
 package service
 
-import "github.com/namburisnehitha/IssueTracker/domain"
+import (
+	"github.com/google/uuid"
+	"github.com/namburisnehitha/IssueTracker/domain"
+)
 
 type LabelService struct {
 	labelRepository domain.LabelRepository
@@ -12,12 +15,13 @@ func NewLabelService(labelrepository domain.LabelRepository) *LabelService {
 	}
 }
 
-func (l *LabelService) CreateLabel(id string, name string, description string, colour string) error {
+func (l *LabelService) CreateLabel(name string, description string, colour string) (string, error) {
+	id := uuid.New().String()
 	label, err := domain.NewLabel(id, name, description, colour)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return l.labelRepository.Save(label)
+	return id, l.labelRepository.Save(label)
 }
 
 func (l *LabelService) GetById(id string) (domain.Label, error) {

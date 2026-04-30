@@ -65,7 +65,7 @@ func TestCreateActivity(t *testing.T) {
 	action := domain.UserAssigned
 	repo := &MockActivityRepository{activities: map[string]domain.Activity{}}
 	service := NewActivityService(repo)
-	err := service.CreateActivity(id, issueid, userid, description, action)
+	id, err := service.CreateActivity(issueid, userid, description, action)
 	saved := repo.activities[id]
 
 	if err != nil {

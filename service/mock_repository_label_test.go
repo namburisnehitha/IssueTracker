@@ -60,7 +60,7 @@ func TestCreateLabel(t *testing.T) {
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
 	service := NewLabelService(repo)
 	repo.labels[id] = domain.Label{Id: id, Name: name, Description: description, Colour: colour}
-	err := service.CreateLabel(id, name, description, colour)
+	id, err := service.CreateLabel(name, description, colour)
 	saved := repo.labels[id]
 
 	if err != nil {

@@ -61,10 +61,9 @@ func TestCreateNewComment(t *testing.T) {
 	issueid := "01"
 	userid := "01"
 	content := "Create a ne comment"
-	id := "1"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
 	service := NewCommentService(repo)
-	err := service.CreateComment(issueid, userid, content, id)
+	id, err := service.CreateComment(issueid, userid, content)
 	saved := repo.comments[id]
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)

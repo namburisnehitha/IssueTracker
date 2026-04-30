@@ -59,12 +59,11 @@ func (m *MockIssueRepository) ListIssues() ([]domain.Issue, error) {
 }
 
 func TestCreateIssue(t *testing.T) {
-	id := "01"
 	title := "Create Isuue"
 	description := "create the issue"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
-	err := service.CreateIssue(id, title, description)
+	id, err := service.CreateIssue(title, description)
 	saved := repo.issues[id]
 
 	if err != nil {

@@ -1,6 +1,9 @@
 package service
 
-import "github.com/namburisnehitha/IssueTracker/domain"
+import (
+	"github.com/google/uuid"
+	"github.com/namburisnehitha/IssueTracker/domain"
+)
 
 type ActivityService struct {
 	activityRepository domain.ActivityRepository
@@ -12,9 +15,13 @@ func NewActivityService(activityRepository domain.ActivityRepository) *ActivityS
 	}
 }
 
-func (a *ActivityService) CreateActivity(id string, issueid string, userid string, description string, action domain.ActivityType) error {
-	activity := domain.NewActivity(id, issueid, userid, description, action)
-	return a.activityRepository.Save(activity)
+func (a *ActivityService) CreateActivity(issueid string, userid string, description string, action domain.ActivityType) (string, error) {
+	id := uuid.New().String()
+	activity, err := domain.NewActivity(id, issueid, userid, description, action)
+	if err != nil {
+		return "", err
+	}
+	return id, a.activityRepository.Save(activity)
 
 }
 

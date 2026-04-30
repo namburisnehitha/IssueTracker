@@ -1,6 +1,9 @@
 package service
 
-import "github.com/namburisnehitha/IssueTracker/domain"
+import (
+	"github.com/google/uuid"
+	"github.com/namburisnehitha/IssueTracker/domain"
+)
 
 type IssueService struct {
 	issueRepository domain.IssueRepository
@@ -12,12 +15,13 @@ func NewIssueService(issueRepository domain.IssueRepository) *IssueService {
 	}
 }
 
-func (i *IssueService) CreateIssue(id string, title string, description string) error {
+func (i *IssueService) CreateIssue(title string, description string) (string, error) {
+	id := uuid.New().String()
 	issue, err := domain.NewIssue(id, title, description)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return i.issueRepository.Save(issue)
+	return id, i.issueRepository.Save(issue)
 }
 
 func (i *IssueService) GetById(id string) (domain.Issue, error) {
