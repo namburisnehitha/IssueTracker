@@ -57,30 +57,40 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, user)
 }
 
-func (u *UserHandler) GetByName(w http.ResponseWriter, r *http.Request) {
+func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
-	user, err := u.userservice.GetByName(name)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, user)
-}
-
-func (u *UserHandler) GetByRole(w http.ResponseWriter, r *http.Request) {
-
 	role := r.URL.Query().Get("role")
-	user, err := u.userservice.GetByRole(domain.Roles(role))
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if name != "" {
+		user, err := u.userservice.GetByName(name)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, user)
+	} else if role != "" {
+		user, err := u.userservice.GetByRole(domain.Roles(role))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, user)
+	} else {
+
+		users, err := u.userservice.UserList()
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, users)
 	}
-
-	writeJSON(w, http.StatusOK, user)
 }
 
 func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -131,16 +141,4 @@ func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (u *UserHandler) UserList(w http.ResponseWriter, r *http.Request) {
-
-	users, err := u.userservice.UserList()
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, users)
 }

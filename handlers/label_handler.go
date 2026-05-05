@@ -57,30 +57,43 @@ func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, label)
 }
 
-func (l *LabelHandler) GetByName(w http.ResponseWriter, r *http.Request) {
+func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
-	label, err := l.labelService.GetByName(name)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, label)
-}
-
-func (l *LabelHandler) GetByColour(w http.ResponseWriter, r *http.Request) {
-
 	colour := r.URL.Query().Get("colour")
-	label, err := l.labelService.GetByColour(colour)
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if name != "" {
+		label, err := l.labelService.GetByName(name)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, label)
+
+	} else if colour != "" {
+
+		labels, err := l.labelService.GetByColour(colour)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, labels)
+
+	} else {
+
+		labels, err := l.labelService.LabelList()
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, labels)
 	}
-
-	writeJSON(w, http.StatusOK, label)
 }
 
 func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
@@ -132,16 +145,4 @@ func (l *LabelHandler) DeleteLabel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (l *LabelHandler) LabelList(w http.ResponseWriter, r *http.Request) {
-
-	labels, err := l.labelService.LabelList()
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, labels)
 }

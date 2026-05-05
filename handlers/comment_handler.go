@@ -58,30 +58,40 @@ func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, comment)
 }
 
-func (c *CommentHandler) GetByUserId(w http.ResponseWriter, r *http.Request) {
+func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 
 	userid := r.URL.Query().Get("userid")
-	comment, err := c.commentService.GetByUserId(userid)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, comment)
-}
-
-func (c *CommentHandler) GetByIssueId(w http.ResponseWriter, r *http.Request) {
-
 	issueid := r.URL.Query().Get("issueid")
-	comment, err := c.commentService.GetByIssueId(issueid)
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if userid != "" {
+		comment, err := c.commentService.GetByUserId(userid)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, comment)
+	} else if issueid != "" {
+
+		comment, err := c.commentService.GetByIssueId(issueid)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, comment)
+	} else {
+		comments, err := c.commentService.CommentList()
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, comments)
 	}
-
-	writeJSON(w, http.StatusOK, comment)
 }
 
 func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
@@ -132,16 +142,4 @@ func (c *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (c *CommentHandler) CommentList(w http.ResponseWriter, r *http.Request) {
-
-	comments, err := c.commentService.CommentList()
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, comments)
 }

@@ -60,52 +60,50 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, activity)
 }
 
-func (a *ActivityHandler) GetByUserId(w http.ResponseWriter, r *http.Request) {
+func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 
 	userid := r.URL.Query().Get("userid")
-	activity, err := a.activityService.GetByUserId(userid)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, activity)
-}
-
-func (a *ActivityHandler) GetByIssueId(w http.ResponseWriter, r *http.Request) {
-
 	issueid := r.URL.Query().Get("issueid")
-	activity, err := a.activityService.GetByIssueId(issueid)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, activity)
-}
-
-func (a *ActivityHandler) GetByAction(w http.ResponseWriter, r *http.Request) {
-
 	action := r.URL.Query().Get("action")
-	activity, err := a.activityService.GetByAction(domain.ActivityType(action))
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if userid != "" {
+
+		activity, err := a.activityService.GetByUserId(userid)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, activity)
+	} else if issueid != "" {
+
+		activity, err := a.activityService.GetByIssueId(issueid)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, activity)
+	} else if action != "" {
+
+		activity, err := a.activityService.GetByAction(domain.ActivityType(action))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, activity)
+	} else {
+
+		activities, err := a.activityService.ActivityList()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, activities)
 	}
-
-	writeJSON(w, http.StatusOK, activity)
-}
-
-func (a *ActivityHandler) ActivityList(w http.ResponseWriter, r *http.Request) {
-
-	activities, err := a.activityService.ActivityList()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, activities)
 }
