@@ -58,30 +58,40 @@ func (i *IssueHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, issue)
 }
 
-func (i *IssueHandler) GetByTitle(w http.ResponseWriter, r *http.Request) {
+func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 
 	title := r.URL.Query().Get("title")
-	issue, err := i.issueService.GetByTitle(title)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, issue)
-}
-
-func (i *IssueHandler) GetByStatus(w http.ResponseWriter, r *http.Request) {
-
 	status := r.URL.Query().Get("status")
-	issue, err := i.issueService.GetByStatus(domain.IssueStatus(status))
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	if title != "" {
+		issue, err := i.issueService.GetByTitle(title)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, issue)
+	} else if status != "" {
+
+		issues, err := i.issueService.GetByStatus(domain.IssueStatus(status))
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, issues)
+	} else {
+
+		issues, err := i.issueService.ListIssues()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, issues)
 	}
-
-	writeJSON(w, http.StatusOK, issue)
 }
 
 func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
@@ -132,15 +142,4 @@ func (i *IssueHandler) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (i *IssueHandler) ListIssues(w http.ResponseWriter, r *http.Request) {
-
-	issues, err := i.issueService.ListIssues()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	writeJSON(w, http.StatusOK, issues)
 }
