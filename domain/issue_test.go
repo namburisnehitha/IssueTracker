@@ -10,7 +10,8 @@ func TestNewIssue(t *testing.T) {
 	id2 := "ISS-001"
 	title2 := ""
 	description2 := "no Title"
-	_, err := NewIssue(id2, title2, description2)
+	assigneeid := "001"
+	_, err := NewIssue(id2, title2, description2, assigneeid)
 
 	if err != ErrInvalidIssueData {
 		t.Errorf("got %v,want %v", err, ErrInvalidIssueData)
@@ -20,7 +21,7 @@ func TestNewIssue(t *testing.T) {
 	title := "Login broken"
 	description := "Users cannot log in"
 
-	issue, err := NewIssue(id, title, description)
+	issue, err := NewIssue(id, title, description, assigneeid)
 
 	if issue.Id != id {
 		t.Errorf("got %v,want %v", issue.Id, id)
@@ -32,6 +33,10 @@ func TestNewIssue(t *testing.T) {
 
 	if issue.Description != description {
 		t.Errorf("got %v,want %v", issue.Description, description)
+	}
+
+	if issue.AssigneeId != assigneeid {
+		t.Errorf("got %v,want %v", issue.AssigneeId, assigneeid)
 	}
 
 	if issue.Status != StatusOpen {
@@ -52,7 +57,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 1: open issue with assignee — should succeed
 
-	issue1, err := NewIssue("001", "title", "desc")
+	issue1, err := NewIssue("001", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -78,7 +83,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 2: open issue, no assignee — should fail
 
-	issue2, err := NewIssue("002", "title", "desc")
+	issue2, err := NewIssue("002", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -100,7 +105,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 3: already in progress — should faild
 
-	issue3, err := NewIssue("003", "title", "desc")
+	issue3, err := NewIssue("003", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -117,7 +122,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 4 : Wrong user id
 
-	issue4, err := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -137,7 +142,7 @@ func TestClose(t *testing.T) {
 	user := &User{Id: "user-123"}
 
 	//status is in progress
-	issue, err := NewIssue("01", "title", "description")
+	issue, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -156,7 +161,7 @@ func TestClose(t *testing.T) {
 	}
 
 	// status not in progress
-	issue2, err := NewIssue("01", "title", "description")
+	issue2, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -170,7 +175,7 @@ func TestClose(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 
-	issue3, err := NewIssue("01", "title", "description")
+	issue3, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -184,7 +189,7 @@ func TestClose(t *testing.T) {
 	}
 
 	//Situation: when user is not assignee
-	issue4, err := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -204,7 +209,7 @@ func TestClose(t *testing.T) {
 func TestReOpen(t *testing.T) {
 	user := &User{Id: "user-123"}
 	//status is in closed
-	issue, err := NewIssue("01", "title", "description")
+	issue, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -223,7 +228,7 @@ func TestReOpen(t *testing.T) {
 	}
 
 	// status is not closed
-	issue2, err := NewIssue("01", "title", "description")
+	issue2, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -237,7 +242,7 @@ func TestReOpen(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 
-	issue3, err := NewIssue("01", "title", "description")
+	issue3, err := NewIssue("01", "title", "description", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -250,7 +255,7 @@ func TestReOpen(t *testing.T) {
 		t.Errorf("got %v,want %v", err, ErrInvalidStateTransition)
 	}
 	// when user is not assignee
-	issue4, err := NewIssue("004", "title", "desc")
+	issue4, err := NewIssue("004", "title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -270,7 +275,7 @@ func TestReOpen(t *testing.T) {
 func TestAssignId(t *testing.T) {
 
 	//not assigned
-	issue, err := NewIssue("01", "Title", "desc")
+	issue, err := NewIssue("01", "Title", "desc", "")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
@@ -288,7 +293,7 @@ func TestAssignId(t *testing.T) {
 		t.Errorf("got %v,want %v", issue.AssigneeId, new_id)
 	}
 	//already assigned
-	issue2, err := NewIssue("01", "Title", "desc")
+	issue2, err := NewIssue("01", "Title", "desc", "01")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)

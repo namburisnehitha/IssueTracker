@@ -15,9 +15,9 @@ func NewIssueService(issueRepository domain.IssueRepository) *IssueService {
 	}
 }
 
-func (i *IssueService) CreateIssue(title string, description string) (string, error) {
+func (i *IssueService) CreateIssue(title string, description string, assigneeid string) (string, error) {
 	id := uuid.New().String()
-	issue, err := domain.NewIssue(id, title, description)
+	issue, err := domain.NewIssue(id, title, description, assigneeid)
 	if err != nil {
 		return "", err
 	}

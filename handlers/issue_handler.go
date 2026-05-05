@@ -12,6 +12,7 @@ type CreateIssueRequest struct {
 	Id          string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	AssigneeId  string `json:"assignee_id"`
 }
 
 type IssueHandler struct {
@@ -34,7 +35,7 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ir.Id, err = i.issueService.CreateIssue(ir.Title, ir.Description)
+	ir.Id, err = i.issueService.CreateIssue(ir.Title, ir.Description, ir.AssigneeId)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
