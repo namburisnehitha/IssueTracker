@@ -3,5 +3,6 @@ CREATE TABLE users (
     user_name  	 		TEXT 		NOT NULL,
 	user_role 	 		TEXT 		NOT NULL,
 	joined_at 		    TIMESTAMP	NOT NULL,
-	changed_role_at	    TIMESTAMP   
+	changed_role_at	    TIMESTAMP   		,
+	user_password		TEXT		NOT NULL
 );

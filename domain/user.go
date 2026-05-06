@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Roles string
 
@@ -16,6 +18,7 @@ type User struct {
 	Id            string
 	JoinedAt      time.Time
 	ChangedRoleAt time.Time
+	Password      string
 }
 
 func NewUser(Name string, id string) (User, error) {
