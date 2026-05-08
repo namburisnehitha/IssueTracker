@@ -1,11 +1,10 @@
 package auth
 
 import (
-	"errors"
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/namburisnehitha/IssueTracker/domain"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 func HashPassword(Password string) (string, error) {
@@ -52,7 +51,7 @@ func ValidateToken(tokenString string) (string, error) {
 	claims, ok := token.Claims.(*jwt.MapClaims)
 
 	if !ok || !token.Valid {
-		return "", errors.New("invalid token")
+		return "", domain.ErrInvalidToken
 	}
 
 	userID := (*claims)["user_id"].(string)
