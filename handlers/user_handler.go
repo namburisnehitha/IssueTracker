@@ -10,8 +10,10 @@ import (
 )
 
 type CreateUserRequest struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 type UserHandler struct {
@@ -34,7 +36,7 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ur.Id, err = u.userservice.CreateUser(ur.Name)
+	ur.Id, err = u.userservice.CreateUser(ur.Name, ur.UserName, ur.Password)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
