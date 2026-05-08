@@ -1,9 +1,8 @@
 package service
 
 import (
-	"testing"
-
 	"github.com/namburisnehitha/IssueTracker/domain"
+	"testing"
 )
 
 type MockUserRepository struct {
@@ -59,9 +58,14 @@ func (m *MockUserRepository) UserList() ([]domain.User, error) {
 }
 
 func (m *MockUserRepository) GetByUserName(username string) (domain.User, error) {
-	user := m.users[username]
-	return user, nil
+	for _, user := range m.users {
+		if user.UserName == username {
+			return user, nil
+		}
+	}
+	return domain.User{}, domain.ErrInvalidUserData
 }
+
 func TestCreateUser(t *testing.T) {
 
 	name := "user"

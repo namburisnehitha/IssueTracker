@@ -21,8 +21,12 @@ func (m *MockLabelRepository) GetById(id string) (domain.Label, error) {
 }
 
 func (m *MockLabelRepository) GetByName(name string) (domain.Label, error) {
-	label := m.labels[name]
-	return label, nil
+	for _, label := range m.labels {
+		if label.Name == name {
+			return label, nil
+		}
+	}
+	return domain.Label{}, domain.ErrInvalidLabelData
 }
 
 func (m *MockLabelRepository) GetByColour(colour string) ([]domain.Label, error) {
