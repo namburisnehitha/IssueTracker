@@ -83,7 +83,7 @@ func TestStart(t *testing.T) {
 
 	// Situation 2: open issue, no assignee — should fail
 
-	issue2, err := NewIssue("002", "title", "desc", "01")
+	issue2, err := NewIssue("002", "title", "desc", "")
 
 	if err != nil {
 		t.Fatalf("failed to create issue: %v", err)
