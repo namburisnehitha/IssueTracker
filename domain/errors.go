@@ -66,4 +66,8 @@ var (
 		Code:    "INVALID_USER_DATA",
 		Message: "user data is not valid",
 	}
+	ErrInvalidToken = DomainError{
+		Code:    "INVALID_TOKEN",
+		Message: "token is invalid or expired",
+	}
 )
