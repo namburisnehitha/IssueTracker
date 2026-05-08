@@ -4,5 +4,6 @@ CREATE TABLE users (
 	user_role 	 		TEXT 		NOT NULL,
 	joined_at 		    TIMESTAMP	NOT NULL,
 	changed_role_at	    TIMESTAMP   		,
+	user_username		TEXT 		UNIQUE,
 	user_password		TEXT		NOT NULL
 );

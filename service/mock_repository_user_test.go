@@ -58,6 +58,10 @@ func (m *MockUserRepository) UserList() ([]domain.User, error) {
 	return result, nil
 }
 
+func (m *MockUserRepository) GetByUserName(username string) (domain.User, error) {
+	user := m.users[username]
+	return user, nil
+}
 func TestCreateUser(t *testing.T) {
 
 	name := "user"
@@ -191,5 +195,23 @@ func TestUserList(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
+	}
+}
+
+func TestGetByUserName(t *testing.T) {
+	id := "01"
+	username := "sneh"
+	repo := &MockUserRepository{users: map[string]domain.User{}}
+	service := NewUserService(repo)
+	repo.users[id] = domain.User{Id: id, Name: "user", Role: domain.RoleAdmin, UserName: username}
+
+	user, err := service.GetByUserName(username)
+
+	if err != nil {
+		t.Errorf("got %v,want %v", err, nil)
+	}
+
+	if user.UserName != username {
+		t.Errorf("got %v,want %v", user.UserName, username)
 	}
 }

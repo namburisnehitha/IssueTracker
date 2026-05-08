@@ -47,3 +47,7 @@ func (u *UserService) DeleteUser(user domain.User) error {
 func (u *UserService) UserList() ([]domain.User, error) {
 	return u.userRepository.UserList()
 }
+
+func (u *UserService) GetByUserName(username string) (domain.User, error) {
+	return u.userRepository.GetByUserName(username)
+}

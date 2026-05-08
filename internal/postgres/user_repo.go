@@ -16,21 +16,21 @@ func NewPostgresUserRepository(db *sql.DB) *PostgresUsersRepository {
 }
 
 func (ur *PostgresUsersRepository) Save(user domain.User) error {
-	query := `INSERT INTO users (id,user_name,user_role,joined_at,changed_role_at) VALUES ($1, $2,$3,$4,$5)`
-	_, err := ur.db.Exec(query, user.Id, user.Name, user.Role, user.JoinedAt, user.ChangedRoleAt)
+	query := `INSERT INTO users (id,user_name,user_role,joined_at,changed_role_at,user_username,user_password) VALUES ($1, $2,$3,$4,$5,$6,$7)`
+	_, err := ur.db.Exec(query, user.Id, user.Name, user.Role, user.JoinedAt, user.ChangedRoleAt, user.UserName, user.Password)
 	return err
 }
 
 func (ur *PostgresUsersRepository) GetById(id string) (domain.User, error) {
 	var user domain.User
-	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users WHERE id = $1`
-	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt)
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at,user_username,user_password FROM users WHERE id = $1`
+	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
 	return user, err
 }
 
 func (ur *PostgresUsersRepository) GetByName(name string) ([]domain.User, error) {
 	var users []domain.User
-	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users WHERE user_name =$1`
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at,user_username,user_password  FROM users WHERE user_name =$1`
 	rows, err := ur.db.Query(query, name)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (ur *PostgresUsersRepository) GetByName(name string) ([]domain.User, error)
 	defer rows.Close()
 	for rows.Next() {
 		var u domain.User
-		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
+		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func (ur *PostgresUsersRepository) GetByName(name string) ([]domain.User, error)
 
 func (ur *PostgresUsersRepository) GetByRole(role domain.Roles) ([]domain.User, error) {
 	var users []domain.User
-	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users WHERE user_role =$1`
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at,user_username,user_password  FROM users WHERE user_role =$1`
 	rows, err := ur.db.Query(query, role)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (ur *PostgresUsersRepository) GetByRole(role domain.Roles) ([]domain.User, 
 	defer rows.Close()
 	for rows.Next() {
 		var u domain.User
-		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
+		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +80,7 @@ func (ur *PostgresUsersRepository) DeleteUser(user domain.User) error {
 
 func (ur *PostgresUsersRepository) UserList() ([]domain.User, error) {
 	var users []domain.User
-	query := `SELECT id,user_name,user_role,joined_at,changed_role_at FROM users `
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at,user_username,user_password FROM users `
 	rows, err := ur.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -88,11 +88,18 @@ func (ur *PostgresUsersRepository) UserList() ([]domain.User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var u domain.User
-		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt)
+		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			return nil, err
 		}
 		users = append(users, u)
 	}
 	return users, err
+}
+
+func (ur *PostgresUsersRepository) GetByUserName(username string) (domain.User, error) {
+	var user domain.User
+	query := `SELECT id,user_name,user_role,joined_at,changed_role_at,user_username,user_password FROM users WHERE user_username = $1`
+	err := ur.db.QueryRow(query, username).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
+	return user, err
 }

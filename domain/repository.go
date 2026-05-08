@@ -47,4 +47,5 @@ type UserRepository interface {
 	UpdateUser(user User) error
 	DeleteUser(user User) error
 	UserList() ([]User, error)
+	GetByUserName(name string) (User, error)
 }

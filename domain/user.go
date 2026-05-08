@@ -18,6 +18,7 @@ type User struct {
 	Id            string
 	JoinedAt      time.Time
 	ChangedRoleAt time.Time
+	UserName      string
 	Password      string
 }
 
