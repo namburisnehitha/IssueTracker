@@ -22,16 +22,19 @@ type User struct {
 	Password      string
 }
 
-func NewUser(Name string, id string) (User, error) {
-	if Name == "" {
+func NewUser(name string, id string, username string, password string) (User, error) {
+	if name == "" {
 		return User{}, ErrInvalidUserData
 	}
+
 	return User{
-		Name:          Name,
+		Name:          name,
 		Role:          RoleDeveloper,
 		Id:            id,
 		JoinedAt:      time.Now(),
 		ChangedRoleAt: time.Time{},
+		UserName:      username,
+		Password:      password,
 	}, nil
 }
 
