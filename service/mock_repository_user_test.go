@@ -71,7 +71,7 @@ func TestCreateUser(t *testing.T) {
 	name := "user"
 	repo := &MockUserRepository{users: map[string]domain.User{}}
 	service := NewUserService(repo)
-	id, err := service.CreateUser(name)
+	id, err := service.CreateUser(name, "username", "##")
 	saved := repo.users[id]
 
 	if err != nil {

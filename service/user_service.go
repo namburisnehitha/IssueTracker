@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/google/uuid"
 	"github.com/namburisnehitha/IssueTracker/domain"
+	"github.com/namburisnehitha/IssueTracker/internal/auth"
 )
 
 type UserService struct {
@@ -15,12 +16,20 @@ func NewUserService(userRepository domain.UserRepository) *UserService {
 	}
 }
 
-func (u *UserService) CreateUser(name string) (string, error) {
+func (u *UserService) CreateUser(name string, username string, password string) (string, error) {
+
 	id := uuid.New().String()
-	user, err := domain.NewUser(name, id)
+
+	user, err := domain.NewUser(name, id, username, password)
 	if err != nil {
 		return "", err
 	}
+	user.Password, err = auth.HashPassword(password)
+
+	if err != nil {
+		return "", err
+	}
+
 	return id, u.userRepository.Save(user)
 }
 
