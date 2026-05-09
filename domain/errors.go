@@ -70,4 +70,8 @@ var (
 		Code:    "INVALID_TOKEN",
 		Message: "token is invalid or expired",
 	}
+	ErrEmptyHeader = DomainError{
+		Code:    "EMPTY_HEADER",
+		Message: "the header is empty",
+	}
 )
