@@ -1,10 +1,13 @@
 package auth
 
 import (
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 func HashPassword(Password string) (string, error) {
@@ -57,4 +60,28 @@ func ValidateToken(tokenString string) (string, error) {
 	userID := (*claims)["user_id"].(string)
 
 	return userID, err
+}
+
+func JWTMiddleware(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+
+		authToken := r.Header.Get("Authorization")
+
+		if authToken == "" {
+			http.Error(w, domain.ErrEmptyHeader.Error(), http.StatusBadRequest)
+			return
+		}
+
+		tokenString := strings.TrimPrefix(authToken, "Bearer ")
+		_, err := ValidateToken(tokenString)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+
+	}
+	return http.HandlerFunc(fn)
 }
