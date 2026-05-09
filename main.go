@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/namburisnehitha/IssueTracker/handlers"
 	"github.com/namburisnehitha/IssueTracker/internal/postgres"
 	"github.com/namburisnehitha/IssueTracker/service"
-	"log"
-	"net/http"
 )
 
 func main() {
@@ -36,7 +37,9 @@ func main() {
 	activityservice := service.NewActivityService(activityrepo)
 	activityhandler := handlers.NewActivityHandler(activityservice)
 
-	r := SetUpRoutes(issuehandler, userhandler, labelhandler, commenthandler, activityhandler)
+	authHandler := handlers.NewAuthHandler(userservice)
+
+	r := SetUpRoutes(issuehandler, userhandler, labelhandler, commenthandler, activityhandler, authHandler)
 	fmt.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal(err)
