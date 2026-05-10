@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/namburisnehitha/IssueTracker/domain"
@@ -16,20 +17,20 @@ func NewPostgresCommentRepository(db *sql.DB) *PostgresCommentRepository {
 	}
 }
 
-func (cr *PostgresCommentRepository) Save(comment domain.Comment) error {
+func (cr *PostgresCommentRepository) Save(ctx context.Context, comment domain.Comment) error {
 	query := `INSERT into comments ( id,issue_id,user_id,content,created_at,updated_at) values($1,$2,$3,$4,$5,$6)`
 	_, err := cr.db.Exec(query, comment.Id, comment.IssueId, comment.UserId, comment.Content, comment.CreatedAt, comment.UpdatedAt)
 	return err
 }
 
-func (cr *PostgresCommentRepository) GetById(id string) (domain.Comment, error) {
+func (cr *PostgresCommentRepository) GetById(ctx context.Context, id string) (domain.Comment, error) {
 	var comment domain.Comment
 	query := `SELECT  id,issue_id,user_id,content,created_at,updated_at FROM comments WHERE id = $1`
 	err := cr.db.QueryRow(query, id).Scan(&comment.Id, &comment.IssueId, &comment.UserId, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt)
 	return comment, err
 }
 
-func (cr *PostgresCommentRepository) GetByUserId(userid string) ([]domain.Comment, error) {
+func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid string) ([]domain.Comment, error) {
 	var comments []domain.Comment
 	query := `SELECT  id,issue_id,user_id,content,created_at,updated_at FROM comments WHERE user_id = $1`
 	rows, err := cr.db.Query(query, userid)
@@ -47,7 +48,7 @@ func (cr *PostgresCommentRepository) GetByUserId(userid string) ([]domain.Commen
 	return comments, err
 }
 
-func (cr *PostgresCommentRepository) GetByIssueId(issueid string) ([]domain.Comment, error) {
+func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid string) ([]domain.Comment, error) {
 	var comments []domain.Comment
 	query := `SELECT  id,issue_id,user_id,content,created_at,updated_at FROM comments WHERE issue_id = $1`
 	rows, err := cr.db.Query(query, issueid)
@@ -65,19 +66,19 @@ func (cr *PostgresCommentRepository) GetByIssueId(issueid string) ([]domain.Comm
 	return comments, err
 }
 
-func (cr *PostgresCommentRepository) UpdateComment(comment domain.Comment) error {
+func (cr *PostgresCommentRepository) UpdateComment(ctx context.Context, comment domain.Comment) error {
 	query := `UPDATE comments SET content = $1,updated_at = $2 WHERE id = $3`
 	_, err := cr.db.Exec(query, comment.Content, comment.UpdatedAt, comment.Id)
 	return err
 }
 
-func (cr *PostgresCommentRepository) DeleteComment(comment domain.Comment) error {
+func (cr *PostgresCommentRepository) DeleteComment(ctx context.Context, comment domain.Comment) error {
 	query := `DELETE FROM comments WHERE id = $1`
 	_, err := cr.db.Exec(query, comment.Id)
 	return err
 }
 
-func (cr *PostgresCommentRepository) CommentList() ([]domain.Comment, error) {
+func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.Comment, error) {
 	var comments []domain.Comment
 	query := `SELECT  id,issue_id,user_id,content,created_at,updated_at FROM comments `
 	rows, err := cr.db.Query(query)
