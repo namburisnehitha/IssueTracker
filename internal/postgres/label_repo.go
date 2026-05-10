@@ -37,7 +37,7 @@ func (lr *PostgresLabelRepository) GetByName(name string) (domain.Label, error) 
 
 func (lr *PostgresLabelRepository) GetByColour(colour string) ([]domain.Label, error) {
 	var labels []domain.Label
-	query := `SELECT id,label_name,label_description,colour FROM labels WHERE label_colour = $1 `
+	query := `SELECT id,label_name,label_description,colour FROM labels WHERE colour = $1 `
 	rows, err := lr.db.Query(query, colour)
 	if err != nil {
 		return nil, err
