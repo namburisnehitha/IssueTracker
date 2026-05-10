@@ -1,25 +1,27 @@
 package service
 
 import (
-	"github.com/namburisnehitha/IssueTracker/domain"
+	"context"
 	"testing"
+
+	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
 type MockCommentRepository struct {
 	comments map[string]domain.Comment
 }
 
-func (m *MockCommentRepository) Save(comment domain.Comment) error {
+func (m *MockCommentRepository) Save(ctx context.Context, comment domain.Comment) error {
 	m.comments[comment.Id] = comment
 	return nil
 }
 
-func (m *MockCommentRepository) GetById(id string) (domain.Comment, error) {
+func (m *MockCommentRepository) GetById(ctx context.Context, id string) (domain.Comment, error) {
 	comment := m.comments[id]
 	return comment, nil
 }
 
-func (m *MockCommentRepository) GetByUserId(userid string) ([]domain.Comment, error) {
+func (m *MockCommentRepository) GetByUserId(ctx context.Context, userid string) ([]domain.Comment, error) {
 	var result []domain.Comment
 	for _, comment := range m.comments {
 		if comment.UserId == userid {
@@ -29,7 +31,7 @@ func (m *MockCommentRepository) GetByUserId(userid string) ([]domain.Comment, er
 	return result, nil
 }
 
-func (m *MockCommentRepository) GetByIssueId(issueid string) ([]domain.Comment, error) {
+func (m *MockCommentRepository) GetByIssueId(ctx context.Context, issueid string) ([]domain.Comment, error) {
 	var result []domain.Comment
 	for _, comment := range m.comments {
 		if comment.IssueId == issueid {
@@ -39,17 +41,17 @@ func (m *MockCommentRepository) GetByIssueId(issueid string) ([]domain.Comment, 
 	return result, nil
 }
 
-func (m *MockCommentRepository) UpdateComment(comment domain.Comment) error {
+func (m *MockCommentRepository) UpdateComment(ctx context.Context, comment domain.Comment) error {
 	m.comments[comment.Id] = comment
 	return nil
 }
 
-func (m *MockCommentRepository) DeleteComment(comment domain.Comment) error {
+func (m *MockCommentRepository) DeleteComment(ctx context.Context, comment domain.Comment) error {
 	delete(m.comments, comment.Id)
 	return nil
 }
 
-func (m *MockCommentRepository) CommentList() ([]domain.Comment, error) {
+func (m *MockCommentRepository) CommentList(ctx context.Context) ([]domain.Comment, error) {
 	var result []domain.Comment
 	for _, comment := range m.comments {
 		result = append(result, comment)
@@ -63,7 +65,7 @@ func TestCreateNewComment(t *testing.T) {
 	content := "Create a ne comment"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
 	service := NewCommentService(repo)
-	id, err := service.CreateComment(issueid, userid, content)
+	id, err := service.CreateComment(context.Background(), issueid, userid, content)
 	saved := repo.comments[id]
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -89,7 +91,7 @@ func TestCommentGetById(t *testing.T) {
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
 	service := NewCommentService(repo)
 	repo.comments[id] = domain.Comment{Id: id}
-	comment, err := service.GetById(id)
+	comment, err := service.GetById(context.Background(), id)
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
 	}
@@ -108,7 +110,7 @@ func TestCommentGetByIssueId(t *testing.T) {
 	repo.comments["01"] = domain.Comment{Id: "01", IssueId: issueid1}
 	repo.comments["02"] = domain.Comment{Id: "02", IssueId: issueid2}
 	repo.comments["03"] = domain.Comment{Id: "03", IssueId: issueid3}
-	comments, err := service.GetByIssueId(issueid1)
+	comments, err := service.GetByIssueId(context.Background(), issueid1)
 
 	for _, comment := range comments {
 		if comment.IssueId != issueid1 {
@@ -136,7 +138,7 @@ func TestCommentGetByUserId(t *testing.T) {
 	repo.comments["01"] = domain.Comment{Id: "01", UserId: userid1}
 	repo.comments["02"] = domain.Comment{Id: "02", UserId: userid2}
 	repo.comments["03"] = domain.Comment{Id: "03", UserId: userid3}
-	comments, err := service.GetByUserId(userid1)
+	comments, err := service.GetByUserId(context.Background(), userid1)
 
 	for _, comment := range comments {
 		if comment.UserId != userid1 {
@@ -161,7 +163,7 @@ func TestUpdateComment(t *testing.T) {
 	service := NewCommentService(repo)
 	repo.comments[id] = domain.Comment{Id: id, Content: "old comment"}
 	comment := domain.Comment{Id: id, Content: content}
-	err := service.UpdateComment(comment)
+	err := service.UpdateComment(context.Background(), comment)
 	updated := repo.comments[id]
 
 	if err != nil {
@@ -180,7 +182,7 @@ func TestDeleteComment(t *testing.T) {
 	service := NewCommentService(repo)
 	repo.comments[id] = domain.Comment{Id: id, Content: "comment"}
 	comment := domain.Comment{Id: id, Content: "comment"}
-	err := service.DeleteComment(comment)
+	err := service.DeleteComment(context.Background(), comment)
 	_, exists := repo.comments["01"]
 
 	if exists {
@@ -199,7 +201,7 @@ func TestListComments(t *testing.T) {
 	repo.comments["01"] = domain.Comment{Id: "01", Content: "comment"}
 	repo.comments["02"] = domain.Comment{Id: "02", Content: "comment"}
 	repo.comments["03"] = domain.Comment{Id: "03", Content: "comment"}
-	comments, err := service.CommentList()
+	comments, err := service.CommentList(context.Background())
 
 	if len(comments) != 3 {
 		t.Errorf("got %v,want %v", len(comments), 3)

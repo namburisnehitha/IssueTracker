@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"github.com/namburisnehitha/IssueTracker/domain"
@@ -10,17 +11,17 @@ type MockIssueRepository struct {
 	issues map[string]domain.Issue
 }
 
-func (m *MockIssueRepository) Save(issue domain.Issue) error {
+func (m *MockIssueRepository) Save(ctx context.Context, issue domain.Issue) error {
 	m.issues[issue.Id] = issue
 	return nil
 }
 
-func (m *MockIssueRepository) GetById(id string) (domain.Issue, error) {
+func (m *MockIssueRepository) GetById(ctx context.Context, id string) (domain.Issue, error) {
 	issue := m.issues[id]
 	return issue, nil
 }
 
-func (m *MockIssueRepository) GetByStatus(status domain.IssueStatus) ([]domain.Issue, error) {
+func (m *MockIssueRepository) GetByStatus(ctx context.Context, status domain.IssueStatus) ([]domain.Issue, error) {
 	var result []domain.Issue
 	for _, issue := range m.issues {
 		if issue.Status == status {
@@ -30,7 +31,7 @@ func (m *MockIssueRepository) GetByStatus(status domain.IssueStatus) ([]domain.I
 	return result, nil
 }
 
-func (m *MockIssueRepository) GetByTitle(title string) ([]domain.Issue, error) {
+func (m *MockIssueRepository) GetByTitle(ctx context.Context, title string) ([]domain.Issue, error) {
 	var result []domain.Issue
 	for _, issue := range m.issues {
 		if issue.Title == title {
@@ -40,17 +41,17 @@ func (m *MockIssueRepository) GetByTitle(title string) ([]domain.Issue, error) {
 	return result, nil
 }
 
-func (m *MockIssueRepository) UpdateIssue(issue domain.Issue) error {
+func (m *MockIssueRepository) UpdateIssue(ctx context.Context, issue domain.Issue) error {
 	m.issues[issue.Id] = issue
 	return nil
 }
 
-func (m *MockIssueRepository) DeleteIssue(issue domain.Issue) error {
+func (m *MockIssueRepository) DeleteIssue(ctx context.Context, issue domain.Issue) error {
 	delete(m.issues, issue.Id)
 	return nil
 }
 
-func (m *MockIssueRepository) ListIssues() ([]domain.Issue, error) {
+func (m *MockIssueRepository) ListIssues(ctx context.Context) ([]domain.Issue, error) {
 	var result []domain.Issue
 	for _, issue := range m.issues {
 		result = append(result, issue)
@@ -63,8 +64,10 @@ func TestCreateIssue(t *testing.T) {
 	description := "create the issue"
 	assignee_id := "001"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
+
 	service := NewIssueService(repo)
-	id, err := service.CreateIssue(title, description, assignee_id)
+
+	id, err := service.CreateIssue(context.Background(), title, description, assignee_id)
 	saved := repo.issues[id]
 
 	if err != nil {
@@ -91,7 +94,7 @@ func TestIsssueGetById(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
 	repo.issues[id] = domain.Issue{Id: id, Title: "test"}
-	issue, err := service.GetById(id)
+	issue, err := service.GetById(context.Background(), id)
 
 	if issue.Id != id {
 		t.Errorf("got %v,want %v", issue.Id, id)
@@ -109,7 +112,7 @@ func TestIssueGetByStatus(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status}
-	issue, err := service.GetByStatus(status)
+	issue, err := service.GetByStatus(context.Background(), status)
 
 	if issue[0].Status != status {
 		t.Errorf("got %v,want %v", issue[0].Status, status)
@@ -128,7 +131,7 @@ func TestIssueGetByStatus(t *testing.T) {
 	repo1.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status1}
 	repo1.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: status2}
 	repo1.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: status3}
-	issues, err := service1.GetByStatus(status0)
+	issues, err := service1.GetByStatus(context.Background(), status0)
 	for _, issue := range issues {
 		if issue.Status != status0 {
 			t.Errorf("got %v,want %v", issue.Status, status)
@@ -149,7 +152,7 @@ func TestIssueGetByTitle(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 	service := NewIssueService(repo)
 	repo.issues["01"] = domain.Issue{Id: "01", Title: title}
-	issue, err := service.GetByTitle(title)
+	issue, err := service.GetByTitle(context.Background(), title)
 
 	if issue[0].Title != title {
 		t.Errorf("got %v,want %v", issue[0].Title, title)
@@ -168,7 +171,7 @@ func TestIssueGetByTitle(t *testing.T) {
 	repo1.issues["01"] = domain.Issue{Id: "01", Title: title1}
 	repo1.issues["02"] = domain.Issue{Id: "02", Title: title2}
 	repo1.issues["03"] = domain.Issue{Id: "03", Title: title3}
-	issues, err := service1.GetByTitle(title0)
+	issues, err := service1.GetByTitle(context.Background(), title0)
 	for _, issue := range issues {
 		if issue.Title != title0 {
 			t.Errorf("got %v,want %v", issue.Title, title)
@@ -189,7 +192,7 @@ func TestUpdateIssue(t *testing.T) {
 	service := NewIssueService(repo)
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "old"}
 	issue := domain.Issue{Id: "01", Title: title}
-	err := service.UpdateIssue(issue)
+	err := service.UpdateIssue(context.Background(), issue)
 	updated := repo.issues["01"]
 
 	if updated.Title != title {
@@ -206,7 +209,7 @@ func TestDeleteIssue(t *testing.T) {
 	service := NewIssueService(repo)
 	repo.issues[id] = domain.Issue{Id: id}
 	issue := domain.Issue{Id: id}
-	err := service.DeleteIssue(issue)
+	err := service.DeleteIssue(context.Background(), issue)
 
 	_, exists := repo.issues["01"]
 
@@ -225,7 +228,7 @@ func TestListIssue(t *testing.T) {
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: domain.StatusOpen}
 	repo.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: domain.StatusOpen}
 	repo.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: domain.StatusOpen}
-	issues, err := service1.ListIssues()
+	issues, err := service1.ListIssues(context.Background())
 	if len(issues) != 3 {
 		t.Errorf("got %v, want %v", len(issues), 3)
 	}

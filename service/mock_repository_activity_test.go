@@ -1,25 +1,27 @@
 package service
 
 import (
-	"github.com/namburisnehitha/IssueTracker/domain"
+	"context"
 	"testing"
+
+	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
 type MockActivityRepository struct {
 	activities map[string]domain.Activity
 }
 
-func (m *MockActivityRepository) Save(activity domain.Activity) error {
+func (m *MockActivityRepository) Save(ctx context.Context, activity domain.Activity) error {
 	m.activities[activity.Id] = activity
 	return nil
 }
 
-func (m *MockActivityRepository) GetById(id string) (domain.Activity, error) {
+func (m *MockActivityRepository) GetById(ctx context.Context, id string) (domain.Activity, error) {
 	activity := m.activities[id]
 	return activity, nil
 }
 
-func (m *MockActivityRepository) GetByUserId(userid string) ([]domain.Activity, error) {
+func (m *MockActivityRepository) GetByUserId(ctx context.Context, userid string) ([]domain.Activity, error) {
 	var result []domain.Activity
 	for _, activity := range m.activities {
 		if activity.UserId == userid {
@@ -29,7 +31,7 @@ func (m *MockActivityRepository) GetByUserId(userid string) ([]domain.Activity, 
 	return result, nil
 }
 
-func (m *MockActivityRepository) GetByIssueId(issueid string) ([]domain.Activity, error) {
+func (m *MockActivityRepository) GetByIssueId(ctx context.Context, issueid string) ([]domain.Activity, error) {
 	var result []domain.Activity
 	for _, activity := range m.activities {
 		if activity.IssueId == issueid {
@@ -39,7 +41,7 @@ func (m *MockActivityRepository) GetByIssueId(issueid string) ([]domain.Activity
 	return result, nil
 }
 
-func (m *MockActivityRepository) GetByAction(action domain.ActivityType) ([]domain.Activity, error) {
+func (m *MockActivityRepository) GetByAction(ctx context.Context, action domain.ActivityType) ([]domain.Activity, error) {
 	var result []domain.Activity
 	for _, activity := range m.activities {
 		if activity.Action == action {
@@ -49,7 +51,7 @@ func (m *MockActivityRepository) GetByAction(action domain.ActivityType) ([]doma
 	return result, nil
 }
 
-func (m *MockActivityRepository) ActivityList() ([]domain.Activity, error) {
+func (m *MockActivityRepository) ActivityList(ctx context.Context) ([]domain.Activity, error) {
 	var result []domain.Activity
 	for _, activity := range m.activities {
 		result = append(result, activity)
@@ -65,7 +67,7 @@ func TestCreateActivity(t *testing.T) {
 	action := domain.UserAssigned
 	repo := &MockActivityRepository{activities: map[string]domain.Activity{}}
 	service := NewActivityService(repo)
-	id, err := service.CreateActivity(issueid, userid, description, action)
+	id, err := service.CreateActivity(context.Background(), issueid, userid, description, action)
 	saved := repo.activities[id]
 
 	if err != nil {
@@ -98,7 +100,7 @@ func TestActivityGetById(t *testing.T) {
 	repo := &MockActivityRepository{activities: map[string]domain.Activity{}}
 	service := NewActivityService(repo)
 	repo.activities[id] = domain.Activity{Id: id}
-	activity, err := service.GetById(id)
+	activity, err := service.GetById(context.Background(), id)
 
 	if activity.Id != id {
 		t.Errorf("got %v,want %v", activity.Id, id)
@@ -120,7 +122,7 @@ func TestActivityGetByIssueId(t *testing.T) {
 	repo.activities["02"] = domain.Activity{Id: "02", IssueId: issueid2}
 	repo.activities["03"] = domain.Activity{Id: "03", IssueId: issueid3}
 
-	activities, err := service.GetByIssueId(issueid)
+	activities, err := service.GetByIssueId(context.Background(), issueid)
 
 	for _, activity := range activities {
 		if activity.IssueId != issueid {
@@ -148,7 +150,7 @@ func TestActivityGetByUserId(t *testing.T) {
 	repo.activities["02"] = domain.Activity{Id: "02", UserId: userid2}
 	repo.activities["03"] = domain.Activity{Id: "03", UserId: userid3}
 
-	activities, err := service.GetByUserId(userid)
+	activities, err := service.GetByUserId(context.Background(), userid)
 
 	for _, activity := range activities {
 		if activity.UserId != userid {
@@ -172,7 +174,7 @@ func TestActivityList(t *testing.T) {
 	repo.activities["02"] = domain.Activity{Id: "02"}
 	repo.activities["03"] = domain.Activity{Id: "03"}
 
-	activities, err := service.ActivityList()
+	activities, err := service.ActivityList(context.Background())
 
 	if len(activities) != 3 {
 		t.Errorf("got %v,want %v", len(activities), 3)

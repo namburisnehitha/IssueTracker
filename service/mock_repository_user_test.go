@@ -1,25 +1,27 @@
 package service
 
 import (
-	"github.com/namburisnehitha/IssueTracker/domain"
+	"context"
 	"testing"
+
+	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
 type MockUserRepository struct {
 	users map[string]domain.User
 }
 
-func (m *MockUserRepository) Save(user domain.User) error {
+func (m *MockUserRepository) Save(ctx context.Context, user domain.User) error {
 	m.users[user.Id] = user
 	return nil
 }
 
-func (m *MockUserRepository) GetById(id string) (domain.User, error) {
+func (m *MockUserRepository) GetById(ctx context.Context, id string) (domain.User, error) {
 	user := m.users[id]
 	return user, nil
 }
 
-func (m *MockUserRepository) GetByName(name string) ([]domain.User, error) {
+func (m *MockUserRepository) GetByName(ctx context.Context, name string) ([]domain.User, error) {
 	var result []domain.User
 	for _, user := range m.users {
 		if user.Name == name {
@@ -29,7 +31,7 @@ func (m *MockUserRepository) GetByName(name string) ([]domain.User, error) {
 	return result, nil
 }
 
-func (m *MockUserRepository) GetByRole(role domain.Roles) ([]domain.User, error) {
+func (m *MockUserRepository) GetByRole(ctx context.Context, role domain.Roles) ([]domain.User, error) {
 	var result []domain.User
 	for _, user := range m.users {
 		if user.Role == role {
@@ -39,17 +41,17 @@ func (m *MockUserRepository) GetByRole(role domain.Roles) ([]domain.User, error)
 	return result, nil
 }
 
-func (m *MockUserRepository) UpdateUser(user domain.User) error {
+func (m *MockUserRepository) UpdateUser(ctx context.Context, user domain.User) error {
 	m.users[user.Id] = user
 	return nil
 }
 
-func (m *MockUserRepository) DeleteUser(user domain.User) error {
+func (m *MockUserRepository) DeleteUser(ctx context.Context, user domain.User) error {
 	delete(m.users, user.Id)
 	return nil
 }
 
-func (m *MockUserRepository) UserList() ([]domain.User, error) {
+func (m *MockUserRepository) UserList(ctx context.Context) ([]domain.User, error) {
 	var result []domain.User
 	for _, user := range m.users {
 		result = append(result, user)
@@ -57,7 +59,7 @@ func (m *MockUserRepository) UserList() ([]domain.User, error) {
 	return result, nil
 }
 
-func (m *MockUserRepository) GetByUserName(username string) (domain.User, error) {
+func (m *MockUserRepository) GetByUserName(ctx context.Context, username string) (domain.User, error) {
 	for _, user := range m.users {
 		if user.UserName == username {
 			return user, nil
@@ -71,7 +73,7 @@ func TestCreateUser(t *testing.T) {
 	name := "user"
 	repo := &MockUserRepository{users: map[string]domain.User{}}
 	service := NewUserService(repo)
-	id, err := service.CreateUser(name, "username", "##")
+	id, err := service.CreateUser(context.Background(), name, "username", "##")
 	saved := repo.users[id]
 
 	if err != nil {
@@ -93,7 +95,7 @@ func TestGetById(t *testing.T) {
 	repo := &MockUserRepository{users: map[string]domain.User{}}
 	service := NewUserService(repo)
 	repo.users[id] = domain.User{Id: id, Name: "user", Role: domain.RoleAdmin}
-	user, err := service.GetById(id)
+	user, err := service.GetById(context.Background(), id)
 
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -110,7 +112,7 @@ func TestGetByName(t *testing.T) {
 	repo.users["01"] = domain.User{Id: "01", Name: "user1"}
 	repo.users["02"] = domain.User{Id: "02", Name: "user2"}
 	repo.users["03"] = domain.User{Id: "03", Name: "user1"}
-	users, err := service.GetByName(name)
+	users, err := service.GetByName(context.Background(), name)
 
 	for _, user := range users {
 		if user.Name != name {
@@ -133,7 +135,7 @@ func TestGetByRole(t *testing.T) {
 	repo.users["01"] = domain.User{Id: "01", Name: "user1", Role: domain.RoleAdmin}
 	repo.users["02"] = domain.User{Id: "02", Name: "user2", Role: domain.RoleDeveloper}
 	repo.users["03"] = domain.User{Id: "03", Name: "user3", Role: domain.RoleAdmin}
-	users, err := service.GetByRole(role)
+	users, err := service.GetByRole(context.Background(), role)
 
 	for _, user := range users {
 		if user.Role != role {
@@ -156,7 +158,7 @@ func TestUpdateUser(t *testing.T) {
 	service := NewUserService(repo)
 	repo.users["01"] = domain.User{Id: "01", Name: "user", Role: domain.RoleDeveloper}
 	user := domain.User{Id: "01", Name: "user", Role: newrole}
-	err := service.UpdateUser(user)
+	err := service.UpdateUser(context.Background(), user)
 	saved := repo.users["01"]
 
 	if err != nil {
@@ -174,7 +176,7 @@ func TestDeleteUser(t *testing.T) {
 	service := NewUserService(repo)
 	repo.users["01"] = domain.User{Id: "01", Name: "user", Role: domain.RoleDeveloper}
 	user := domain.User{Id: "01"}
-	err := service.DeleteUser(user)
+	err := service.DeleteUser(context.Background(), user)
 
 	_, exists := repo.users["01"]
 
@@ -192,7 +194,7 @@ func TestUserList(t *testing.T) {
 	repo.users["01"] = domain.User{Id: "01", Name: "name"}
 	repo.users["02"] = domain.User{Id: "02", Name: "name"}
 	repo.users["03"] = domain.User{Id: "03", Name: "name"}
-	users, err := service1.UserList()
+	users, err := service1.UserList(context.Background())
 
 	if len(users) != 3 {
 		t.Errorf("got %v, want %v", len(users), 3)
@@ -209,7 +211,7 @@ func TestGetByUserName(t *testing.T) {
 	service := NewUserService(repo)
 	repo.users[id] = domain.User{Id: id, Name: "user", Role: domain.RoleAdmin, UserName: username}
 
-	user, err := service.GetByUserName(username)
+	user, err := service.GetByUserName(context.Background(), username)
 
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
