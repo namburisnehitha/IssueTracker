@@ -6,6 +6,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/service"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type CreateLabelRequest struct {
@@ -17,15 +20,21 @@ type CreateLabelRequest struct {
 
 type LabelHandler struct {
 	labelService service.LabelService
+	tracer       trace.Tracer
 }
 
 func NewLabelHandler(labelSevice *service.LabelService) *LabelHandler {
 	return &LabelHandler{
 		labelService: *labelSevice,
+		tracer:       otel.Tracer("label-handler"),
 	}
 }
 
 func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
+
+	_, span := l.tracer.Start(r.Context(), "CreateLabel")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	var lr CreateLabelRequest
 	err := json.NewDecoder(r.Body).Decode(&lr)
@@ -46,6 +55,10 @@ func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
 
 func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
+	_, span := l.tracer.Start(r.Context(), "GetById")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	id := chi.URLParam(r, "id")
 	label, err := l.labelService.GetById(id)
 
@@ -58,6 +71,10 @@ func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
+
+	_, span := l.tracer.Start(r.Context(), "GetLabel")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	name := r.URL.Query().Get("name")
 	colour := r.URL.Query().Get("colour")
@@ -98,6 +115,10 @@ func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
 
 func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 
+	_, span := l.tracer.Start(r.Context(), "UpdateLabel")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	var lr CreateLabelRequest
 	err := json.NewDecoder(r.Body).Decode(&lr)
 
@@ -128,6 +149,10 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *LabelHandler) DeleteLabel(w http.ResponseWriter, r *http.Request) {
+
+	_, span := l.tracer.Start(r.Context(), "DeleteLabel")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	id := chi.URLParam(r, "id")
 	label, err := l.labelService.GetById(id)

@@ -2,9 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/service"
-	"net/http"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type CreateCommentRequest struct {
@@ -16,15 +20,21 @@ type CreateCommentRequest struct {
 
 type CommentHandler struct {
 	commentService *service.CommentService
+	tracer         trace.Tracer
 }
 
 func NewCommentHandler(commentService *service.CommentService) *CommentHandler {
 	return &CommentHandler{
 		commentService: commentService,
+		tracer:         otel.Tracer("comment-handler"),
 	}
 }
 
 func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
+
+	_, span := c.tracer.Start(r.Context(), "CreateComment")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	var cr CreateCommentRequest
 	err := json.NewDecoder(r.Body).Decode(&cr)
@@ -47,6 +57,10 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
+	_, span := c.tracer.Start(r.Context(), "GetById")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	id := chi.URLParam(r, "id")
 	comment, err := c.commentService.GetById(id)
 
@@ -59,6 +73,10 @@ func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
+
+	_, span := c.tracer.Start(r.Context(), "GetComment")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	userid := r.URL.Query().Get("userid")
 	issueid := r.URL.Query().Get("issueid")
@@ -96,6 +114,10 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 
+	_, span := c.tracer.Start(r.Context(), "UpdateComment")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	var cr CreateCommentRequest
 
 	id := chi.URLParam(r, "id")
@@ -125,6 +147,10 @@ func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
+
+	_, span := c.tracer.Start(r.Context(), "DeleteComment")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	id := chi.URLParam(r, "id")
 	comment, err := c.commentService.GetById(id)

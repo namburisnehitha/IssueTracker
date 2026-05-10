@@ -7,6 +7,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"github.com/namburisnehitha/IssueTracker/service"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type CreateActivityRequest struct {
@@ -19,15 +22,21 @@ type CreateActivityRequest struct {
 
 type ActivityHandler struct {
 	activityService *service.ActivityService
+	tracer          trace.Tracer
 }
 
 func NewActivityHandler(activityService *service.ActivityService) *ActivityHandler {
 	return &ActivityHandler{
 		activityService: activityService,
+		tracer:          otel.Tracer("activity-handler"),
 	}
 }
 
 func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Request) {
+
+	_, span := a.tracer.Start(r.Context(), "Createactivity")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	var ar CreateActivityRequest
 	err := json.NewDecoder(r.Body).Decode(&ar)
@@ -49,6 +58,10 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 
 func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
+	_, span := a.tracer.Start(r.Context(), "GetById")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	id := chi.URLParam(r, "id")
 	activity, err := a.activityService.GetById(id)
 
@@ -61,6 +74,10 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
+
+	_, span := a.tracer.Start(r.Context(), "Getactivity")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	userid := r.URL.Query().Get("userid")
 	issueid := r.URL.Query().Get("issueid")

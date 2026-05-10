@@ -7,6 +7,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"github.com/namburisnehitha/IssueTracker/service"
+	"go.opentelemetry.io/otel"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type CreateUserRequest struct {
@@ -18,15 +21,21 @@ type CreateUserRequest struct {
 
 type UserHandler struct {
 	userservice *service.UserService
+	tracer      trace.Tracer
 }
 
 func NewUserHandler(userservice *service.UserService) *UserHandler {
 	return &UserHandler{
 		userservice: userservice,
+		tracer:      otel.Tracer("user-handler"),
 	}
 }
 
 func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+
+	_, span := u.tracer.Start(r.Context(), "CreateUser")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	var ur CreateUserRequest
 	err := json.NewDecoder(r.Body).Decode(&ur)
@@ -48,6 +57,10 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
+	_, span := u.tracer.Start(r.Context(), "GetById")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	id := chi.URLParam(r, "id")
 	user, err := u.userservice.GetById(id)
 
@@ -60,6 +73,10 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+
+	_, span := u.tracer.Start(r.Context(), "GetUser")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	name := r.URL.Query().Get("name")
 	role := r.URL.Query().Get("role")
@@ -97,6 +114,10 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
+	_, span := u.tracer.Start(r.Context(), "UpdateUser")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
 	var ur CreateUserRequest
 	err := json.NewDecoder(r.Body).Decode(&ur)
 
@@ -126,6 +147,10 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
+	_, span := u.tracer.Start(r.Context(), "DeleteUser")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
 
 	id := chi.URLParam(r, "id")
 	user, err := u.userservice.GetById(id)
