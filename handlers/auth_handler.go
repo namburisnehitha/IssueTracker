@@ -31,7 +31,7 @@ func NewAuthHandler(userservice *service.UserService) *AuthHandler {
 
 func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
-	_, span := ah.tracer.Start(r.Context(), "login")
+	ctx, span := ah.tracer.Start(r.Context(), "login")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -43,7 +43,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := ah.userService.GetByUserName(ur.UserName)
+	user, err := ah.userService.GetByUserName(ctx, ur.UserName)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -32,7 +32,7 @@ func NewCommentHandler(commentService *service.CommentService) *CommentHandler {
 
 func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
-	_, span := c.tracer.Start(r.Context(), "CreateComment")
+	ctx, span := c.tracer.Start(r.Context(), "CreateComment")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -44,7 +44,7 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cr.Id, err = c.commentService.CreateComment(cr.IssueId, cr.UserId, cr.Content)
+	cr.Id, err = c.commentService.CreateComment(ctx, cr.IssueId, cr.UserId, cr.Content)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -57,12 +57,12 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
-	_, span := c.tracer.Start(r.Context(), "GetById")
+	ctx, span := c.tracer.Start(r.Context(), "GetById")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	comment, err := c.commentService.GetById(id)
+	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -74,7 +74,7 @@ func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 
-	_, span := c.tracer.Start(r.Context(), "GetComment")
+	ctx, span := c.tracer.Start(r.Context(), "GetComment")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -82,7 +82,7 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 	issueid := r.URL.Query().Get("issueid")
 
 	if userid != "" {
-		comment, err := c.commentService.GetByUserId(userid)
+		comment, err := c.commentService.GetByUserId(ctx, userid)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -92,7 +92,7 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, comment)
 	} else if issueid != "" {
 
-		comment, err := c.commentService.GetByIssueId(issueid)
+		comment, err := c.commentService.GetByIssueId(ctx, issueid)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -101,7 +101,7 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 
 		writeJSON(w, http.StatusOK, comment)
 	} else {
-		comments, err := c.commentService.CommentList()
+		comments, err := c.commentService.CommentList(ctx)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -114,14 +114,14 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 
-	_, span := c.tracer.Start(r.Context(), "UpdateComment")
+	ctx, span := c.tracer.Start(r.Context(), "UpdateComment")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	var cr CreateCommentRequest
 
 	id := chi.URLParam(r, "id")
-	comment, err := c.commentService.GetById(id)
+	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -135,7 +135,7 @@ func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	comment.Content = cr.Content
-	err = c.commentService.UpdateComment(comment)
+	err = c.commentService.UpdateComment(ctx, comment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -148,19 +148,19 @@ func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 
 func (c *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 
-	_, span := c.tracer.Start(r.Context(), "DeleteComment")
+	ctx, span := c.tracer.Start(r.Context(), "DeleteComment")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	comment, err := c.commentService.GetById(id)
+	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = c.commentService.DeleteComment(comment)
+	err = c.commentService.DeleteComment(ctx, comment)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

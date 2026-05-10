@@ -34,7 +34,7 @@ func NewActivityHandler(activityService *service.ActivityService) *ActivityHandl
 
 func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Request) {
 
-	_, span := a.tracer.Start(r.Context(), "Createactivity")
+	ctx, span := a.tracer.Start(r.Context(), "Createactivity")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -46,7 +46,7 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	ar.Id, err = a.activityService.CreateActivity(ar.IssueId, ar.UserId, ar.Description, ar.Action)
+	ar.Id, err = a.activityService.CreateActivity(ctx, ar.IssueId, ar.UserId, ar.Description, ar.Action)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -58,12 +58,12 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 
 func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
-	_, span := a.tracer.Start(r.Context(), "GetById")
+	ctx, span := a.tracer.Start(r.Context(), "GetById")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	activity, err := a.activityService.GetById(id)
+	activity, err := a.activityService.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -75,7 +75,7 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 
-	_, span := a.tracer.Start(r.Context(), "Getactivity")
+	ctx, span := a.tracer.Start(r.Context(), "Getactivity")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -85,7 +85,7 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 
 	if userid != "" {
 
-		activity, err := a.activityService.GetByUserId(userid)
+		activity, err := a.activityService.GetByUserId(ctx, userid)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -95,7 +95,7 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, activity)
 	} else if issueid != "" {
 
-		activity, err := a.activityService.GetByIssueId(issueid)
+		activity, err := a.activityService.GetByIssueId(ctx, issueid)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -105,7 +105,7 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, activity)
 	} else if action != "" {
 
-		activity, err := a.activityService.GetByAction(domain.ActivityType(action))
+		activity, err := a.activityService.GetByAction(ctx, domain.ActivityType(action))
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -115,7 +115,7 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, activity)
 	} else {
 
-		activities, err := a.activityService.ActivityList()
+		activities, err := a.activityService.ActivityList(ctx)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

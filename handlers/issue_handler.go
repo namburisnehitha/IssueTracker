@@ -33,7 +33,7 @@ func NewIssueHandler(issueService *service.IssueService) *IssueHandler {
 
 func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 
-	_, span := i.tracer.Start(r.Context(), "CreateIssue")
+	ctx, span := i.tracer.Start(r.Context(), "CreateIssue")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -46,7 +46,7 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ir.Id, err = i.issueService.CreateIssue(ir.Title, ir.Description, ir.AssigneeId)
+	ir.Id, err = i.issueService.CreateIssue(ctx, ir.Title, ir.Description, ir.AssigneeId)
 
 	if err != nil {
 		span.RecordError(err)
@@ -60,12 +60,12 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 
 func (i *IssueHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
-	_, span := i.tracer.Start(r.Context(), "GetById")
+	ctx, span := i.tracer.Start(r.Context(), "GetById")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	issue, err := i.issueService.GetById(id)
+	issue, err := i.issueService.GetById(ctx, id)
 
 	if err != nil {
 		span.RecordError(err)
@@ -78,7 +78,7 @@ func (i *IssueHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 
-	_, span := i.tracer.Start(r.Context(), "GetIssue")
+	ctx, span := i.tracer.Start(r.Context(), "GetIssue")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -86,7 +86,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 	status := r.URL.Query().Get("status")
 
 	if title != "" {
-		issue, err := i.issueService.GetByTitle(title)
+		issue, err := i.issueService.GetByTitle(ctx, title)
 
 		if err != nil {
 			span.RecordError(err)
@@ -97,7 +97,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, issue)
 	} else if status != "" {
 
-		issues, err := i.issueService.GetByStatus(domain.IssueStatus(status))
+		issues, err := i.issueService.GetByStatus(ctx, domain.IssueStatus(status))
 
 		if err != nil {
 			span.RecordError(err)
@@ -108,7 +108,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, issues)
 	} else {
 
-		issues, err := i.issueService.ListIssues()
+		issues, err := i.issueService.ListIssues(ctx)
 		if err != nil {
 			span.RecordError(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -121,14 +121,14 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 
 func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
-	_, span := i.tracer.Start(r.Context(), "UpdateIssue")
+	ctx, span := i.tracer.Start(r.Context(), "UpdateIssue")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	var ir CreateIssueRequest
 
 	id := chi.URLParam(r, "id")
-	issue, err := i.issueService.GetById(id)
+	issue, err := i.issueService.GetById(ctx, id)
 
 	if err != nil {
 		span.RecordError(err)
@@ -145,7 +145,7 @@ func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	issue.Title = ir.Title
 	issue.Description = ir.Description
-	err = i.issueService.UpdateIssue(issue)
+	err = i.issueService.UpdateIssue(ctx, issue)
 
 	if err != nil {
 		span.RecordError(err)
@@ -159,12 +159,12 @@ func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 func (i *IssueHandler) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
-	_, span := i.tracer.Start(r.Context(), "DeleteIssue")
+	ctx, span := i.tracer.Start(r.Context(), "DeleteIssue")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	issue, err := i.issueService.GetById(id)
+	issue, err := i.issueService.GetById(ctx, id)
 
 	if err != nil {
 		span.RecordError(err)
@@ -172,7 +172,7 @@ func (i *IssueHandler) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = i.issueService.DeleteIssue(issue)
+	err = i.issueService.DeleteIssue(ctx, issue)
 
 	if err != nil {
 		span.RecordError(err)

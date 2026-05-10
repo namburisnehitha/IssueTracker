@@ -33,7 +33,7 @@ func NewUserHandler(userservice *service.UserService) *UserHandler {
 
 func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	_, span := u.tracer.Start(r.Context(), "CreateUser")
+	ctx, span := u.tracer.Start(r.Context(), "CreateUser")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -45,7 +45,7 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ur.Id, err = u.userservice.CreateUser(ur.Name, ur.UserName, ur.Password)
+	ur.Id, err = u.userservice.CreateUser(ctx, ur.Name, ur.UserName, ur.Password)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -57,12 +57,12 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
-	_, span := u.tracer.Start(r.Context(), "GetById")
+	ctx, span := u.tracer.Start(r.Context(), "GetById")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	user, err := u.userservice.GetById(id)
+	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -74,7 +74,7 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
-	_, span := u.tracer.Start(r.Context(), "GetUser")
+	ctx, span := u.tracer.Start(r.Context(), "GetUser")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -82,7 +82,7 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	role := r.URL.Query().Get("role")
 
 	if name != "" {
-		user, err := u.userservice.GetByName(name)
+		user, err := u.userservice.GetByName(ctx, name)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -91,7 +91,7 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
 		writeJSON(w, http.StatusOK, user)
 	} else if role != "" {
-		user, err := u.userservice.GetByRole(domain.Roles(role))
+		user, err := u.userservice.GetByRole(ctx, domain.Roles(role))
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -101,7 +101,7 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, user)
 	} else {
 
-		users, err := u.userservice.UserList()
+		users, err := u.userservice.UserList(ctx)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -114,7 +114,7 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
-	_, span := u.tracer.Start(r.Context(), "UpdateUser")
+	ctx, span := u.tracer.Start(r.Context(), "UpdateUser")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
@@ -126,7 +126,7 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
-	user, err := u.userservice.GetById(id)
+	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -135,7 +135,7 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	user.Name = ur.Name
 
-	err = u.userservice.UpdateUser(user)
+	err = u.userservice.UpdateUser(ctx, user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -148,19 +148,19 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
-	_, span := u.tracer.Start(r.Context(), "DeleteUser")
+	ctx, span := u.tracer.Start(r.Context(), "DeleteUser")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
 	defer span.End()
 
 	id := chi.URLParam(r, "id")
-	user, err := u.userservice.GetById(id)
+	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = u.userservice.DeleteUser(user)
+	err = u.userservice.DeleteUser(ctx, user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
