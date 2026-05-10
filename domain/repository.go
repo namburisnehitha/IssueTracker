@@ -1,51 +1,53 @@
 package domain
 
+import "context"
+
 type IssueRepository interface {
-	Save(issue Issue) error
-	GetById(id string) (Issue, error)
-	GetByStatus(status IssueStatus) ([]Issue, error)
-	GetByTitle(title string) ([]Issue, error)
-	UpdateIssue(issue Issue) error
-	DeleteIssue(issue Issue) error
-	ListIssues() ([]Issue, error)
+	Save(ctx context.Context, issue Issue) error
+	GetById(ctx context.Context, id string) (Issue, error)
+	GetByStatus(ctx context.Context, status IssueStatus) ([]Issue, error)
+	GetByTitle(ctx context.Context, title string) ([]Issue, error)
+	UpdateIssue(ctx context.Context, issue Issue) error
+	DeleteIssue(ctx context.Context, issue Issue) error
+	ListIssues(ctx context.Context) ([]Issue, error)
 }
 
 type LabelRepository interface {
-	Save(label Label) error
-	GetById(id string) (Label, error)
-	GetByName(id string) (Label, error)
-	GetByColour(colour string) ([]Label, error)
-	UpdateLabel(label Label) error
-	DeleteLabel(label Label) error
-	LabelList() ([]Label, error)
+	Save(ctx context.Context, label Label) error
+	GetById(ctx context.Context, id string) (Label, error)
+	GetByName(ctx context.Context, id string) (Label, error)
+	GetByColour(ctx context.Context, colour string) ([]Label, error)
+	UpdateLabel(ctx context.Context, label Label) error
+	DeleteLabel(ctx context.Context, label Label) error
+	LabelList(ctx context.Context) ([]Label, error)
 }
 
 type CommentRepository interface {
-	Save(comment Comment) error
-	GetById(id string) (Comment, error)
-	GetByUserId(userid string) ([]Comment, error)
-	GetByIssueId(issueid string) ([]Comment, error)
-	UpdateComment(comment Comment) error
-	DeleteComment(comment Comment) error
-	CommentList() ([]Comment, error)
+	Save(ctx context.Context, comment Comment) error
+	GetById(ctx context.Context, id string) (Comment, error)
+	GetByUserId(ctx context.Context, userid string) ([]Comment, error)
+	GetByIssueId(ctx context.Context, issueid string) ([]Comment, error)
+	UpdateComment(ctx context.Context, comment Comment) error
+	DeleteComment(ctx context.Context, comment Comment) error
+	CommentList(ctx context.Context) ([]Comment, error)
 }
 
 type ActivityRepository interface {
-	Save(activity Activity) error
-	GetById(id string) (Activity, error)
-	GetByUserId(userid string) ([]Activity, error)
-	GetByIssueId(issueid string) ([]Activity, error)
-	GetByAction(action ActivityType) ([]Activity, error)
-	ActivityList() ([]Activity, error)
+	Save(ctx context.Context, activity Activity) error
+	GetById(ctx context.Context, id string) (Activity, error)
+	GetByUserId(ctx context.Context, userid string) ([]Activity, error)
+	GetByIssueId(ctx context.Context, issueid string) ([]Activity, error)
+	GetByAction(ctx context.Context, action ActivityType) ([]Activity, error)
+	ActivityList(ctx context.Context) ([]Activity, error)
 }
 
 type UserRepository interface {
-	Save(user User) error
-	GetByName(name string) ([]User, error)
-	GetById(id string) (User, error)
-	GetByRole(role Roles) ([]User, error)
-	UpdateUser(user User) error
-	DeleteUser(user User) error
-	UserList() ([]User, error)
-	GetByUserName(name string) (User, error)
+	Save(ctx context.Context, user User) error
+	GetByName(ctx context.Context, name string) ([]User, error)
+	GetById(ctx context.Context, id string) (User, error)
+	GetByRole(ctx context.Context, role Roles) ([]User, error)
+	UpdateUser(ctx context.Context, user User) error
+	DeleteUser(ctx context.Context, user User) error
+	UserList(ctx context.Context) ([]User, error)
+	GetByUserName(ctx context.Context, name string) (User, error)
 }
