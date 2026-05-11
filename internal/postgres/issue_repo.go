@@ -30,7 +30,7 @@ func (ir *PostgresIssueRepository) Save(ctx context.Context, issue domain.Issue)
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ir.db.Exec(query, issue.Id, issue.Title, issue.Description, issue.Status, issue.CreatedAt, issue.AssigneeId)
+	_, err := ir.db.ExecContext(ctx, query, issue.Id, issue.Title, issue.Description, issue.Status, issue.CreatedAt, issue.AssigneeId)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -47,7 +47,7 @@ func (ir *PostgresIssueRepository) GetById(ctx context.Context, id string) (doma
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := ir.db.QueryRow(query, id).Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.CreatedAt, &issue.AssigneeId)
+	err := ir.db.QueryRowContext(ctx, query, id).Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.CreatedAt, &issue.AssigneeId)
 	if err != nil {
 		span.RecordError(err)
 		return domain.Issue{}, err
@@ -64,7 +64,7 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ir.db.Query(query, title)
+	rows, err := ir.db.QueryContext(ctx, query, title)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -91,7 +91,7 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ir.db.Query(query, status)
+	rows, err := ir.db.QueryContext(ctx, query, status)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -117,7 +117,7 @@ func (ir *PostgresIssueRepository) UpdateIssue(ctx context.Context, issue domain
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ir.db.Exec(query, issue.Title, issue.Description, issue.Status, issue.AssigneeId, issue.Id)
+	_, err := ir.db.ExecContext(ctx, query, issue.Title, issue.Description, issue.Status, issue.AssigneeId, issue.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -133,7 +133,7 @@ func (ir *PostgresIssueRepository) DeleteIssue(ctx context.Context, issue domain
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ir.db.Exec(query, issue.Id)
+	_, err := ir.db.ExecContext(ctx, query, issue.Id)
 	if err != nil {
 		span.RecordError(err)
 	}
@@ -149,7 +149,7 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ir.db.Query(query)
+	rows, err := ir.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err

@@ -30,7 +30,7 @@ func (lr *PostgresLabelRepository) Save(ctx context.Context, label domain.Label)
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := lr.db.Exec(query, label.Id, label.Name, label.Description, label.Colour)
+	_, err := lr.db.ExecContext(ctx, query, label.Id, label.Name, label.Description, label.Colour)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -47,7 +47,7 @@ func (lr *PostgresLabelRepository) GetById(ctx context.Context, id string) (doma
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := lr.db.QueryRow(query, id).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
+	err := lr.db.QueryRowContext(ctx, query, id).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
 	if err != nil {
 		span.RecordError(err)
 		return domain.Label{}, err
@@ -64,7 +64,7 @@ func (lr *PostgresLabelRepository) GetByName(ctx context.Context, name string) (
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := lr.db.QueryRow(query, name).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
+	err := lr.db.QueryRowContext(ctx, query, name).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
 	if err != nil {
 		span.RecordError(err)
 		return domain.Label{}, err
@@ -81,7 +81,7 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := lr.db.Query(query, colour)
+	rows, err := lr.db.QueryContext(ctx, query, colour)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -106,7 +106,7 @@ func (lr *PostgresLabelRepository) UpdateLabel(ctx context.Context, label domain
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := lr.db.Exec(query, label.Name, label.Description, label.Colour, label.Id)
+	_, err := lr.db.ExecContext(ctx, query, label.Name, label.Description, label.Colour, label.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -122,7 +122,7 @@ func (lr *PostgresLabelRepository) DeleteLabel(ctx context.Context, label domain
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := lr.db.Exec(query, label.Id)
+	_, err := lr.db.ExecContext(ctx, query, label.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -139,7 +139,7 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := lr.db.Query(query)
+	rows, err := lr.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err

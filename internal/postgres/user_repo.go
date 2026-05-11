@@ -30,7 +30,7 @@ func (ur *PostgresUsersRepository) Save(ctx context.Context, user domain.User) e
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ur.db.Exec(query, user.Id, user.Name, user.Role, user.JoinedAt, user.ChangedRoleAt, user.UserName, user.Password)
+	_, err := ur.db.ExecContext(ctx, query, user.Id, user.Name, user.Role, user.JoinedAt, user.ChangedRoleAt, user.UserName, user.Password)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -46,7 +46,7 @@ func (ur *PostgresUsersRepository) GetById(ctx context.Context, id string) (doma
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
+	err := ur.db.QueryRowContext(ctx, query, id).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
 	if err != nil {
 		span.RecordError(err)
 		return domain.User{}, err
@@ -62,7 +62,7 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ur.db.Query(query, name)
+	rows, err := ur.db.QueryContext(ctx, query, name)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -89,7 +89,7 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ur.db.Query(query, role)
+	rows, err := ur.db.QueryContext(ctx, query, role)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -115,7 +115,7 @@ func (ur *PostgresUsersRepository) UpdateUser(ctx context.Context, user domain.U
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ur.db.Exec(query, user.Name, user.Role, user.ChangedRoleAt, user.Id)
+	_, err := ur.db.ExecContext(ctx, query, user.Name, user.Role, user.ChangedRoleAt, user.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -130,7 +130,7 @@ func (ur *PostgresUsersRepository) DeleteUser(ctx context.Context, user domain.U
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ur.db.Exec(query, user.Id)
+	_, err := ur.db.ExecContext(ctx, query, user.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -146,7 +146,7 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ur.db.Query(query)
+	rows, err := ur.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -172,7 +172,7 @@ func (ur *PostgresUsersRepository) GetByUserName(ctx context.Context, username s
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := ur.db.QueryRow(query, username).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
+	err := ur.db.QueryRowContext(ctx, query, username).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
 	if err != nil {
 		span.RecordError(err)
 		return domain.User{}, err

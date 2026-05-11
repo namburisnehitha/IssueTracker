@@ -30,7 +30,7 @@ func (ar *PostgresActivityRepository) Save(ctx context.Context, activity domain.
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := ar.db.Exec(query, activity.Id, activity.IssueId, activity.UserId, activity.Description, activity.CreatedAt, activity.Action)
+	_, err := ar.db.ExecContext(ctx, query, activity.Id, activity.IssueId, activity.UserId, activity.Description, activity.CreatedAt, activity.Action)
 
 	if err != nil {
 		span.RecordError(err)
@@ -48,7 +48,7 @@ func (ar *PostgresActivityRepository) GetById(ctx context.Context, id string) (d
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := ar.db.QueryRow(query, id).Scan(&activity.Id, &activity.IssueId, &activity.UserId, &activity.Description, &activity.CreatedAt, &activity.Action)
+	err := ar.db.QueryRowContext(ctx, query, id).Scan(&activity.Id, &activity.IssueId, &activity.UserId, &activity.Description, &activity.CreatedAt, &activity.Action)
 	if err != nil {
 		span.RecordError(err)
 		return domain.Activity{}, err
@@ -65,7 +65,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ar.db.Query(query, userid)
+	rows, err := ar.db.QueryContext(ctx, query, userid)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -91,7 +91,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ar.db.Query(query, issueid)
+	rows, err := ar.db.QueryContext(ctx, query, issueid)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -117,7 +117,7 @@ func (ar *PostgresActivityRepository) GetByAction(ctx context.Context, action do
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ar.db.Query(query, action)
+	rows, err := ar.db.QueryContext(ctx, query, action)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -142,7 +142,7 @@ func (ar *PostgresActivityRepository) ActivityList(ctx context.Context) ([]domai
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := ar.db.Query(query)
+	rows, err := ar.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err

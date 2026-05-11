@@ -30,7 +30,7 @@ func (cr *PostgresCommentRepository) Save(ctx context.Context, comment domain.Co
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := cr.db.Exec(query, comment.Id, comment.IssueId, comment.UserId, comment.Content, comment.CreatedAt, comment.UpdatedAt)
+	_, err := cr.db.ExecContext(ctx, query, comment.Id, comment.IssueId, comment.UserId, comment.Content, comment.CreatedAt, comment.UpdatedAt)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -47,7 +47,7 @@ func (cr *PostgresCommentRepository) GetById(ctx context.Context, id string) (do
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	err := cr.db.QueryRow(query, id).Scan(&comment.Id, &comment.IssueId, &comment.UserId, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt)
+	err := cr.db.QueryRowContext(ctx, query, id).Scan(&comment.Id, &comment.IssueId, &comment.UserId, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt)
 	if err != nil {
 		span.RecordError(err)
 		return domain.Comment{}, err
@@ -64,7 +64,7 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := cr.db.Query(query, userid)
+	rows, err := cr.db.QueryContext(ctx, query, userid)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -90,7 +90,7 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := cr.db.Query(query, issueid)
+	rows, err := cr.db.QueryContext(ctx, query, issueid)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
@@ -115,7 +115,7 @@ func (cr *PostgresCommentRepository) UpdateComment(ctx context.Context, comment 
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := cr.db.Exec(query, comment.Content, comment.UpdatedAt, comment.Id)
+	_, err := cr.db.ExecContext(ctx, query, comment.Content, comment.UpdatedAt, comment.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -131,7 +131,7 @@ func (cr *PostgresCommentRepository) DeleteComment(ctx context.Context, comment 
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	_, err := cr.db.Exec(query, comment.Id)
+	_, err := cr.db.ExecContext(ctx, query, comment.Id)
 	if err != nil {
 		span.RecordError(err)
 		return err
@@ -148,7 +148,7 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 	span.SetAttributes(semconv.DBQueryTextKey.String(query))
 	defer span.End()
 
-	rows, err := cr.db.Query(query)
+	rows, err := cr.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
 		return nil, err
