@@ -91,6 +91,7 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var l domain.Label
 		err = rows.Scan(&l.Id, &l.Name, &l.Description, &l.Colour)
@@ -158,6 +159,7 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var l domain.Label
 		err = rows.Scan(&l.Id, &l.Name, &l.Description, &l.Colour)

@@ -73,6 +73,7 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var c domain.Comment
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)
@@ -106,6 +107,7 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var c domain.Comment
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)
@@ -173,6 +175,7 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var c domain.Comment
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)

@@ -74,6 +74,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var a domain.Activity
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
@@ -107,6 +108,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var a domain.Activity
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
