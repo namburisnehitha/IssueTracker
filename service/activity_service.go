@@ -17,7 +17,7 @@ type ActivityService struct {
 func NewActivityService(activityRepository domain.ActivityRepository) *ActivityService {
 	return &ActivityService{
 		activityRepository: activityRepository,
-		tracer:             otel.Tracer("actvity-service"),
+		tracer:             otel.Tracer("activity-service"),
 	}
 }
 
