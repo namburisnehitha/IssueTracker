@@ -76,7 +76,7 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, activity)
 }
 
-func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
+func (a *ActivityHandler) GetActivity(w http.ResponseWriter, r *http.Request) {
 
 	ctx, span := a.tracer.Start(r.Context(), "Getactivity")
 	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
