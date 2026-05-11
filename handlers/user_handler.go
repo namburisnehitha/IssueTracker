@@ -41,14 +41,16 @@ func (u *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&ur)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	ur.Id, err = u.userservice.CreateUser(ctx, ur.Name, ur.UserName, ur.Password)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -65,7 +67,8 @@ func (u *UserHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -85,7 +88,8 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		user, err := u.userservice.GetByName(ctx, name)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -94,7 +98,8 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		user, err := u.userservice.GetByRole(ctx, domain.Roles(role))
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -104,7 +109,8 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		users, err := u.userservice.UserList(ctx)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -122,14 +128,17 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&ur)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
+		return
 	}
 
 	id := chi.URLParam(r, "id")
 	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -138,7 +147,8 @@ func (u *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	err = u.userservice.UpdateUser(ctx, user)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -156,14 +166,16 @@ func (u *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	user, err := u.userservice.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	err = u.userservice.DeleteUser(ctx, user)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 

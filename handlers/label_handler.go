@@ -19,13 +19,13 @@ type CreateLabelRequest struct {
 }
 
 type LabelHandler struct {
-	labelService service.LabelService
+	labelService *service.LabelService
 	tracer       trace.Tracer
 }
 
 func NewLabelHandler(labelSevice *service.LabelService) *LabelHandler {
 	return &LabelHandler{
-		labelService: *labelSevice,
+		labelService: labelSevice,
 		tracer:       otel.Tracer("label-handler"),
 	}
 }
@@ -40,13 +40,15 @@ func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&lr)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	lr.Id, err = l.labelService.CreateLabel(ctx, lr.Name, lr.Description, lr.Colour)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -63,7 +65,8 @@ func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	label, err := l.labelService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -83,7 +86,8 @@ func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
 		label, err := l.labelService.GetByName(ctx, name)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -94,7 +98,8 @@ func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
 		labels, err := l.labelService.GetByColour(ctx, colour)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -105,7 +110,8 @@ func (l *LabelHandler) GetLabel(w http.ResponseWriter, r *http.Request) {
 		labels, err := l.labelService.LabelList(ctx)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -123,7 +129,8 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&lr)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -131,7 +138,8 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 	label, err := l.labelService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -141,7 +149,8 @@ func (l *LabelHandler) UpdateLabel(w http.ResponseWriter, r *http.Request) {
 	err = l.labelService.UpdateLabel(ctx, label)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -158,14 +167,16 @@ func (l *LabelHandler) DeleteLabel(w http.ResponseWriter, r *http.Request) {
 	label, err := l.labelService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	err = l.labelService.DeleteLabel(ctx, label)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 

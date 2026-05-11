@@ -42,7 +42,7 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -50,7 +50,7 @@ func (i *IssueHandler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -69,7 +69,7 @@ func (i *IssueHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -90,7 +90,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			span.RecordError(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -101,7 +101,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			span.RecordError(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -111,7 +111,7 @@ func (i *IssueHandler) GetIssue(w http.ResponseWriter, r *http.Request) {
 		issues, err := i.issueService.ListIssues(ctx)
 		if err != nil {
 			span.RecordError(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -132,14 +132,14 @@ func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 	err = json.NewDecoder(r.Body).Decode(&ir)
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -149,7 +149,7 @@ func (i *IssueHandler) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -168,7 +168,7 @@ func (i *IssueHandler) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -176,7 +176,7 @@ func (i *IssueHandler) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		span.RecordError(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 

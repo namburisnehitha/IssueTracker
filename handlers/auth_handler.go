@@ -39,27 +39,27 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&ur)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	user, err := ah.userService.GetByUserName(ctx, ur.UserName)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	ok := auth.CheckPasswordHash(ur.Password, user.Password)
 	if !ok {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	token, err := auth.GenerateToken(user.Id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 	}
 
 	writeJSON(w, http.StatusOK, token)

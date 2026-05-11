@@ -40,14 +40,16 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&cr)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	cr.Id, err = c.commentService.CreateComment(ctx, cr.IssueId, cr.UserId, cr.Content)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -65,7 +67,8 @@ func (c *CommentHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -85,7 +88,8 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 		comment, err := c.commentService.GetByUserId(ctx, userid)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -95,7 +99,8 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 		comment, err := c.commentService.GetByIssueId(ctx, issueid)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -104,7 +109,8 @@ func (c *CommentHandler) GetComment(w http.ResponseWriter, r *http.Request) {
 		comments, err := c.commentService.CommentList(ctx)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -124,13 +130,15 @@ func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 	err = json.NewDecoder(r.Body).Decode(&cr)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -138,7 +146,8 @@ func (c *CommentHandler) UpdateComment(w http.ResponseWriter, r *http.Request) {
 	err = c.commentService.UpdateComment(ctx, comment)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -156,14 +165,16 @@ func (c *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 	comment, err := c.commentService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	err = c.commentService.DeleteComment(ctx, comment)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 

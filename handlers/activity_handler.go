@@ -42,14 +42,16 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 	err := json.NewDecoder(r.Body).Decode(&ar)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
 	ar.Id, err = a.activityService.CreateActivity(ctx, ar.IssueId, ar.UserId, ar.Description, ar.Action)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -66,7 +68,8 @@ func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	activity, err := a.activityService.GetById(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
 		return
 	}
 
@@ -88,7 +91,8 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		activity, err := a.activityService.GetByUserId(ctx, userid)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -98,7 +102,8 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		activity, err := a.activityService.GetByIssueId(ctx, issueid)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -108,7 +113,8 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 		activity, err := a.activityService.GetByAction(ctx, domain.ActivityType(action))
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
@@ -117,7 +123,8 @@ func (a *ActivityHandler) Getactivity(w http.ResponseWriter, r *http.Request) {
 
 		activities, err := a.activityService.ActivityList(ctx)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			span.RecordError(err)
+			http.Error(w, err.Error(), domainErrorToStatus(err))
 			return
 		}
 
