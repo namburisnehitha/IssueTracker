@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -27,6 +29,14 @@ func CheckPasswordHash(password, hashedpassword string) bool {
 	return err == nil
 }
 
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("JWT_SECRET environment variable not set")
+	}
+	return []byte(secret)
+}
+
 func GenerateToken(userID string) (string, error) {
 
 	claims := jwt.MapClaims{
@@ -35,12 +45,12 @@ func GenerateToken(userID string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte("9q2CLgDY"))
+	return token.SignedString(getJWTSecret())
 
 }
 
 func ReturnAsToken(token *jwt.Token) (interface{}, error) {
-	return []byte("9q2CLgDY"), nil
+	return getJWTSecret(), nil
 }
 
 func ValidateToken(tokenString string) (string, error) {
