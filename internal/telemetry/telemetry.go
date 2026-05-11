@@ -4,12 +4,15 @@ import (
 	"context"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/prometheus"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
 func InitTracer() (func(), error) {
+
 	res, err := resource.New(context.Background(), resource.WithAttributes(semconv.ServiceName("issue-tracker")))
 
 	if err != nil {
@@ -35,4 +38,21 @@ func InitTracer() (func(), error) {
 	return func() {
 		tp.Shutdown(context.Background())
 	}, nil
+}
+
+func InitMeter() (func(), error) {
+
+	exporter, err := prometheus.New()
+
+	if err != nil {
+		return nil, err
+	}
+
+	mp := sdkmetric.NewMeterProvider(sdkmetric.WithReader(exporter))
+	otel.SetMeterProvider(mp)
+
+	return func() {
+		mp.Shutdown(context.Background())
+	}, nil
+
 }
