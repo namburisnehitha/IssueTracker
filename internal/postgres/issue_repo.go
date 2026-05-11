@@ -6,6 +6,7 @@ import (
 
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -33,6 +34,7 @@ func (ir *PostgresIssueRepository) Save(ctx context.Context, issue domain.Issue)
 	_, err := ir.db.ExecContext(ctx, query, issue.Id, issue.Title, issue.Description, issue.Status, issue.CreatedAt, issue.AssigneeId)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -50,6 +52,7 @@ func (ir *PostgresIssueRepository) GetById(ctx context.Context, id string) (doma
 	err := ir.db.QueryRowContext(ctx, query, id).Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.CreatedAt, &issue.AssigneeId)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.Issue{}, err
 	}
 	return issue, err
@@ -67,6 +70,7 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 	rows, err := ir.db.QueryContext(ctx, query, title)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -75,9 +79,15 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 		err := rows.Scan(&i.Id, &i.Title, &i.Description, &i.Status, &i.CreatedAt, &i.AssigneeId)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		issues = append(issues, i)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return issues, err
 }
@@ -94,6 +104,7 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 	rows, err := ir.db.QueryContext(ctx, query, status)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -102,9 +113,15 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 		err := rows.Scan(&i.Id, &i.Title, &i.Description, &i.Status, &i.CreatedAt, &i.AssigneeId)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		issues = append(issues, i)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return issues, err
 }
@@ -120,6 +137,7 @@ func (ir *PostgresIssueRepository) UpdateIssue(ctx context.Context, issue domain
 	_, err := ir.db.ExecContext(ctx, query, issue.Title, issue.Description, issue.Status, issue.AssigneeId, issue.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -136,6 +154,8 @@ func (ir *PostgresIssueRepository) DeleteIssue(ctx context.Context, issue domain
 	_, err := ir.db.ExecContext(ctx, query, issue.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
 	}
 	return err
 }
@@ -152,6 +172,7 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 	rows, err := ir.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -160,9 +181,15 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 		err := rows.Scan(&i.Id, &i.Title, &i.Description, &i.Status, &i.CreatedAt, &i.AssigneeId)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		issues = append(issues, i)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return issues, err
 }

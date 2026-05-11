@@ -6,6 +6,7 @@ import (
 
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -34,6 +35,7 @@ func (ar *PostgresActivityRepository) Save(ctx context.Context, activity domain.
 
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -51,6 +53,7 @@ func (ar *PostgresActivityRepository) GetById(ctx context.Context, id string) (d
 	err := ar.db.QueryRowContext(ctx, query, id).Scan(&activity.Id, &activity.IssueId, &activity.UserId, &activity.Description, &activity.CreatedAt, &activity.Action)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.Activity{}, err
 	}
 	return activity, err
@@ -68,6 +71,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 	rows, err := ar.db.QueryContext(ctx, query, userid)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -75,9 +79,15 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		activities = append(activities, a)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return activities, err
 }
@@ -94,6 +104,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 	rows, err := ar.db.QueryContext(ctx, query, issueid)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -101,9 +112,15 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		activities = append(activities, a)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return activities, err
 }
@@ -120,6 +137,7 @@ func (ar *PostgresActivityRepository) GetByAction(ctx context.Context, action do
 	rows, err := ar.db.QueryContext(ctx, query, action)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -127,9 +145,15 @@ func (ar *PostgresActivityRepository) GetByAction(ctx context.Context, action do
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		activities = append(activities, a)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return activities, err
 }
@@ -152,9 +176,15 @@ func (ar *PostgresActivityRepository) ActivityList(ctx context.Context) ([]domai
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		activities = append(activities, a)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return activities, err
 }

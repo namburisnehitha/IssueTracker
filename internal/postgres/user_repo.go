@@ -6,6 +6,7 @@ import (
 
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -33,6 +34,7 @@ func (ur *PostgresUsersRepository) Save(ctx context.Context, user domain.User) e
 	_, err := ur.db.ExecContext(ctx, query, user.Id, user.Name, user.Role, user.JoinedAt, user.ChangedRoleAt, user.UserName, user.Password)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -49,6 +51,7 @@ func (ur *PostgresUsersRepository) GetById(ctx context.Context, id string) (doma
 	err := ur.db.QueryRowContext(ctx, query, id).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.User{}, err
 	}
 	return user, err
@@ -65,6 +68,7 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 	rows, err := ur.db.QueryContext(ctx, query, name)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -73,9 +77,15 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return users, err
 }
@@ -92,6 +102,7 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 	rows, err := ur.db.QueryContext(ctx, query, role)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -100,9 +111,15 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return users, err
 }
@@ -118,6 +135,7 @@ func (ur *PostgresUsersRepository) UpdateUser(ctx context.Context, user domain.U
 	_, err := ur.db.ExecContext(ctx, query, user.Name, user.Role, user.ChangedRoleAt, user.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -133,6 +151,7 @@ func (ur *PostgresUsersRepository) DeleteUser(ctx context.Context, user domain.U
 	_, err := ur.db.ExecContext(ctx, query, user.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -149,6 +168,7 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 	rows, err := ur.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -157,9 +177,15 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 		err = rows.Scan(&u.Id, &u.Name, &u.Role, &u.JoinedAt, &u.ChangedRoleAt, &u.UserName, &u.Password)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		users = append(users, u)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return users, err
 }
@@ -175,6 +201,7 @@ func (ur *PostgresUsersRepository) GetByUserName(ctx context.Context, username s
 	err := ur.db.QueryRowContext(ctx, query, username).Scan(&user.Id, &user.Name, &user.Role, &user.JoinedAt, &user.ChangedRoleAt, &user.UserName, &user.Password)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.User{}, err
 	}
 	return user, err

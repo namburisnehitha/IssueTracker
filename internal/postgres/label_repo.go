@@ -6,6 +6,7 @@ import (
 
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -33,6 +34,7 @@ func (lr *PostgresLabelRepository) Save(ctx context.Context, label domain.Label)
 	_, err := lr.db.ExecContext(ctx, query, label.Id, label.Name, label.Description, label.Colour)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -50,6 +52,7 @@ func (lr *PostgresLabelRepository) GetById(ctx context.Context, id string) (doma
 	err := lr.db.QueryRowContext(ctx, query, id).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.Label{}, err
 	}
 	return label, err
@@ -67,6 +70,7 @@ func (lr *PostgresLabelRepository) GetByName(ctx context.Context, name string) (
 	err := lr.db.QueryRowContext(ctx, query, name).Scan(&label.Id, &label.Name, &label.Description, &label.Colour)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.Label{}, err
 	}
 	return label, err
@@ -84,6 +88,7 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 	rows, err := lr.db.QueryContext(ctx, query, colour)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -91,9 +96,15 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 		err = rows.Scan(&l.Id, &l.Name, &l.Description, &l.Colour)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		labels = append(labels, l)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return labels, err
 }
@@ -109,6 +120,7 @@ func (lr *PostgresLabelRepository) UpdateLabel(ctx context.Context, label domain
 	_, err := lr.db.ExecContext(ctx, query, label.Name, label.Description, label.Colour, label.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -125,6 +137,7 @@ func (lr *PostgresLabelRepository) DeleteLabel(ctx context.Context, label domain
 	_, err := lr.db.ExecContext(ctx, query, label.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -142,6 +155,7 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 	rows, err := lr.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -149,9 +163,15 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 		err = rows.Scan(&l.Id, &l.Name, &l.Description, &l.Colour)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		labels = append(labels, l)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return labels, err
 }

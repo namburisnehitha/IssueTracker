@@ -6,6 +6,7 @@ import (
 
 	"github.com/namburisnehitha/IssueTracker/domain"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -33,6 +34,7 @@ func (cr *PostgresCommentRepository) Save(ctx context.Context, comment domain.Co
 	_, err := cr.db.ExecContext(ctx, query, comment.Id, comment.IssueId, comment.UserId, comment.Content, comment.CreatedAt, comment.UpdatedAt)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -50,6 +52,7 @@ func (cr *PostgresCommentRepository) GetById(ctx context.Context, id string) (do
 	err := cr.db.QueryRowContext(ctx, query, id).Scan(&comment.Id, &comment.IssueId, &comment.UserId, &comment.Content, &comment.CreatedAt, &comment.UpdatedAt)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return domain.Comment{}, err
 	}
 	return comment, err
@@ -67,6 +70,7 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 	rows, err := cr.db.QueryContext(ctx, query, userid)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -74,9 +78,15 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		comments = append(comments, c)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return comments, err
 }
@@ -93,6 +103,7 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 	rows, err := cr.db.QueryContext(ctx, query, issueid)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -100,9 +111,15 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		comments = append(comments, c)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return comments, err
 }
@@ -118,6 +135,7 @@ func (cr *PostgresCommentRepository) UpdateComment(ctx context.Context, comment 
 	_, err := cr.db.ExecContext(ctx, query, comment.Content, comment.UpdatedAt, comment.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -134,6 +152,7 @@ func (cr *PostgresCommentRepository) DeleteComment(ctx context.Context, comment 
 	_, err := cr.db.ExecContext(ctx, query, comment.Id)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	return err
@@ -151,6 +170,7 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 	rows, err := cr.db.QueryContext(ctx, query)
 	if err != nil {
 		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 	for rows.Next() {
@@ -158,9 +178,15 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 		err = rows.Scan(&c.Id, &c.IssueId, &c.UserId, &c.Content, &c.CreatedAt, &c.UpdatedAt)
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
 			return nil, err
 		}
 		comments = append(comments, c)
+	}
+	if err := rows.Err(); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
 	}
 	return comments, err
 }
