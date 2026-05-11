@@ -19,7 +19,7 @@ type PostgresActivityRepository struct {
 func NewPostgresActivityRepository(db *sql.DB) *PostgresActivityRepository {
 	return &PostgresActivityRepository{
 		db:     db,
-		tracer: otel.Tracer("postgres-actvity-repo"),
+		tracer: otel.Tracer("postgres-activity-repo"),
 	}
 }
 
