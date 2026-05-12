@@ -1,9 +1,13 @@
 package main
 
 import (
+	"log/slog"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/handlers"
 	"github.com/namburisnehitha/IssueTracker/internal/auth"
+	"github.com/namburisnehitha/IssueTracker/internal/telemetry"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func SetUpRoutes(
@@ -13,9 +17,12 @@ func SetUpRoutes(
 	commentHandler *handlers.CommentHandler,
 	activityHandler *handlers.ActivityHandler,
 	authHandler *handlers.AuthHandler,
+	m *telemetry.Metrics,
+	logger *slog.Logger,
+
 ) chi.Router {
 	r := chi.NewRouter()
-
+	r.Use(telemetry.MetricsMiddleware(logger, m))
 	r.Group(func(r chi.Router) {
 		r.Use(auth.JWTMiddleware)
 		r.Get("/issues", issueHandler.GetIssue)
@@ -41,12 +48,13 @@ func SetUpRoutes(
 		r.Put("/comments/{id}", commentHandler.UpdateComment)
 		r.Delete("/comments/{id}", commentHandler.DeleteComment)
 
-		r.Get("/activities", activityHandler.Getactivity)
+		r.Get("/activities", activityHandler.GetActivity)
 		r.Post("/activities", activityHandler.CreateNewActivity)
 	})
 
 	r.Post("/login", authHandler.Login)
 	r.Post("/users", userHandler.CreateUser)
+	r.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
