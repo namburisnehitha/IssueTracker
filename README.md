@@ -3,7 +3,7 @@
 A production-quality issue tracking REST API built in Go, demonstrating clean Domain-Driven Design architecture with full OpenTelemetry observability — traces, metrics, and structured logging.
 
 #Why I Built It
-Built to develop the kind of deep understanding where I can walk into any production codebase and immediately know what's happening — the architecture decisions, the tradeoffs, the failure modes. OpenTelemetry was the natural next layer: once you understand how a system is built, you want to see inside it while it runs. That curiosity led me to the CNCF ecosystem and the OpenTelemetry Go compile instrumentation project.
+##Built to develop the kind of deep understanding where I can walk into any production codebase and immediately know what's happening — the architecture decisions, the tradeoffs, the failure modes. OpenTelemetry was the natural next layer: once you understand how a system is built, you want to see inside it while it runs. That curiosity led me to the CNCF ecosystem and the OpenTelemetry Go compile instrumentation project.
 ---
 
 ## Table of Contents
