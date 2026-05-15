@@ -35,10 +35,10 @@ func (cr *PostgresCommentRepository) Save(ctx context.Context, comment domain.Co
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (cr *PostgresCommentRepository) GetById(ctx context.Context, id string) (domain.Comment, error) {
@@ -54,10 +54,10 @@ func (cr *PostgresCommentRepository) GetById(ctx context.Context, id string) (do
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return domain.Comment{}, err
 	}
-	return comment, err
+	span.SetStatus(codes.Ok, "")
+	return comment, nil
 }
 
 func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid string) ([]domain.Comment, error) {
@@ -73,7 +73,6 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -83,7 +82,6 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		comments = append(comments, c)
@@ -91,10 +89,10 @@ func (cr *PostgresCommentRepository) GetByUserId(ctx context.Context, userid str
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
-	return comments, err
+	span.SetStatus(codes.Ok, "")
+	return comments, nil
 }
 
 func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid string) ([]domain.Comment, error) {
@@ -110,7 +108,6 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -120,7 +117,6 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		comments = append(comments, c)
@@ -128,10 +124,10 @@ func (cr *PostgresCommentRepository) GetByIssueId(ctx context.Context, issueid s
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
-	return comments, err
+	span.SetStatus(codes.Ok, "")
+	return comments, nil
 }
 
 func (cr *PostgresCommentRepository) UpdateComment(ctx context.Context, comment domain.Comment) error {
@@ -146,10 +142,10 @@ func (cr *PostgresCommentRepository) UpdateComment(ctx context.Context, comment 
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (cr *PostgresCommentRepository) DeleteComment(ctx context.Context, comment domain.Comment) error {
@@ -164,10 +160,10 @@ func (cr *PostgresCommentRepository) DeleteComment(ctx context.Context, comment 
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.Comment, error) {
@@ -183,7 +179,6 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -193,7 +188,6 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		comments = append(comments, c)
@@ -204,5 +198,6 @@ func (cr *PostgresCommentRepository) CommentList(ctx context.Context) ([]domain.
 		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
-	return comments, err
+	span.SetStatus(codes.Ok, "")
+	return comments, nil
 }

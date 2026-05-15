@@ -35,10 +35,10 @@ func (lr *PostgresLabelRepository) Save(ctx context.Context, label domain.Label)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (lr *PostgresLabelRepository) GetById(ctx context.Context, id string) (domain.Label, error) {
@@ -54,10 +54,10 @@ func (lr *PostgresLabelRepository) GetById(ctx context.Context, id string) (doma
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return domain.Label{}, err
 	}
-	return label, err
+	span.SetStatus(codes.Ok, "")
+	return label, nil
 }
 
 func (lr *PostgresLabelRepository) GetByName(ctx context.Context, name string) (domain.Label, error) {
@@ -73,10 +73,10 @@ func (lr *PostgresLabelRepository) GetByName(ctx context.Context, name string) (
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return domain.Label{}, err
 	}
-	return label, err
+	span.SetStatus(codes.Ok, "")
+	return label, nil
 }
 
 func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour string) ([]domain.Label, error) {
@@ -92,7 +92,6 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -102,7 +101,6 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		labels = append(labels, l)
@@ -110,10 +108,10 @@ func (lr *PostgresLabelRepository) GetByColour(ctx context.Context, colour strin
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
-	return labels, err
+	span.SetStatus(codes.Ok, "")
+	return labels, nil
 }
 
 func (lr *PostgresLabelRepository) UpdateLabel(ctx context.Context, label domain.Label) error {
@@ -128,10 +126,10 @@ func (lr *PostgresLabelRepository) UpdateLabel(ctx context.Context, label domain
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (lr *PostgresLabelRepository) DeleteLabel(ctx context.Context, label domain.Label) error {
@@ -146,10 +144,10 @@ func (lr *PostgresLabelRepository) DeleteLabel(ctx context.Context, label domain
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return err
 	}
-	return err
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Label, error) {
@@ -165,7 +163,6 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -175,7 +172,6 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
-			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		labels = append(labels, l)
@@ -183,22 +179,39 @@ func (lr *PostgresLabelRepository) LabelList(ctx context.Context) ([]domain.Labe
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
-		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return labels, err
 }
 
 func (l *PostgresLabelRepository) AddLabelToIssue(ctx context.Context, issueId string, labelId string) error {
-	_, err := l.db.ExecContext(ctx,
-		"INSERT INTO issue_labels (issue_id, label_id) VALUES ($1, $2)",
-		issueId, labelId)
-	return err
+	query := "INSERT INTO issue_labels (issue_id, label_id) VALUES ($1, $2)"
+	ctx, span := l.tracer.Start(ctx, "AddLabelToIssue")
+	span.SetAttributes(semconv.DBQueryTextKey.String(query))
+	defer span.End()
+
+	_, err := l.db.ExecContext(ctx, query, issueId, labelId)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
 
 func (l *PostgresLabelRepository) RemoveLabelFromIssue(ctx context.Context, issueId string, labelId string) error {
-	_, err := l.db.ExecContext(ctx,
-		"DELETE FROM issue_labels WHERE issue_id=$1 AND label_id=$2",
-		issueId, labelId)
-	return err
+	query := "DELETE FROM issue_labels WHERE issue_id=$1 AND label_id=$2"
+	ctx, span := l.tracer.Start(ctx, "RemoveLabelFromIssue")
+	span.SetAttributes(semconv.DBQueryTextKey.String(query))
+	defer span.End()
+
+	_, err := l.db.ExecContext(ctx, query, issueId, labelId)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
