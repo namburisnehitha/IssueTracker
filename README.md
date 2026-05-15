@@ -134,7 +134,7 @@ Spans include:
 Traces are exported to **Jaeger** via OTLP/gRPC.
 
 ### Traces
-![Jaeger trace showing full span tree](docs/jaeger-trace.png)
+![Jaeger trace](IssueTracker-jaeger.png)
 
 ### Metrics
 
