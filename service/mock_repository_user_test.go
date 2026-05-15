@@ -181,7 +181,7 @@ func TestDeleteUser(t *testing.T) {
 	_, exists := repo.users["01"]
 
 	if exists {
-		t.Errorf("issue was not deleted")
+		t.Errorf("user was not deleted")
 	}
 
 	if err != nil {
