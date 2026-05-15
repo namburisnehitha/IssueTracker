@@ -21,7 +21,7 @@ func InitTracer() (func(), error) {
 
 	exporter, err := otlptracegrpc.New(context.Background(),
 		otlptracegrpc.WithInsecure(),
-		otlptracegrpc.WithEndpoint("OTEL_EXPORTER_OTLP_ENDPOINT"),
+		otlptracegrpc.WithEndpoint(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")),
 	)
 
 	if err != nil {
