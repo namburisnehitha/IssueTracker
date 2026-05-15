@@ -13,7 +13,7 @@ func NewDB(ConnString string) (*sql.DB, error) {
 	db, err := otelsql.Open("postgres", ConnString, otelsql.WithAttributes(semconv.DBSystemPostgreSQL))
 
 	if err != nil {
-		return nil, sql.ErrNoRows
+		return nil, err
 	}
 
 	err = db.Ping()
