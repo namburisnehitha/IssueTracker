@@ -45,7 +45,7 @@ func (c *CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cr.Id, err = c.commentService.CreateComment(ctx, cr.IssueId, cr.UserId, cr.Content)
+	cr.Id, err = c.commentService.CreateComment(ctx, cr.IssueId, cr.Content)
 
 	if err != nil {
 		span.RecordError(err)

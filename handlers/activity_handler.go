@@ -55,7 +55,7 @@ func (a *ActivityHandler) CreateNewActivity(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, nil)
+	writeJSON(w, http.StatusCreated, ar.Id)
 }
 
 func (a *ActivityHandler) GetById(w http.ResponseWriter, r *http.Request) {

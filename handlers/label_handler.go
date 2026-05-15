@@ -52,7 +52,7 @@ func (l *LabelHandler) CreateLabel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, nil)
+	writeJSON(w, http.StatusCreated, lr.Id)
 }
 
 func (l *LabelHandler) GetById(w http.ResponseWriter, r *http.Request) {
@@ -174,6 +174,42 @@ func (l *LabelHandler) DeleteLabel(w http.ResponseWriter, r *http.Request) {
 
 	err = l.labelService.DeleteLabel(ctx, label)
 
+	if err != nil {
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (l *LabelHandler) AddLabelToIssue(w http.ResponseWriter, r *http.Request) {
+	ctx, span := l.tracer.Start(r.Context(), "AddLabelToIssue")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
+	issueId := chi.URLParam(r, "id")
+	labelId := chi.URLParam(r, "labelId")
+
+	err := l.labelService.AddLabelToIssue(ctx, issueId, labelId)
+	if err != nil {
+		span.RecordError(err)
+		http.Error(w, err.Error(), domainErrorToStatus(err))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (l *LabelHandler) RemoveLabelFromIssue(w http.ResponseWriter, r *http.Request) {
+	ctx, span := l.tracer.Start(r.Context(), "RemoveLabelFromIssue")
+	span.SetAttributes(semconv.HTTPRequestMethodKey.String(r.Method), semconv.HTTPRouteKey.String(chi.RouteContext(r.Context()).RoutePattern()))
+	defer span.End()
+
+	issueId := chi.URLParam(r, "id")
+	labelId := chi.URLParam(r, "labelId")
+
+	err := l.labelService.RemoveLabelFromIssue(ctx, issueId, labelId)
 	if err != nil {
 		span.RecordError(err)
 		http.Error(w, err.Error(), domainErrorToStatus(err))

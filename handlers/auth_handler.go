@@ -60,6 +60,7 @@ func (ah *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, err.Error(), domainErrorToStatus(err))
+		return
 	}
 
 	writeJSON(w, http.StatusOK, token)
