@@ -61,11 +61,10 @@ func (m *MockCommentRepository) CommentList(ctx context.Context) ([]domain.Comme
 
 func TestCreateNewComment(t *testing.T) {
 	issueid := "01"
-	userid := "01"
-	content := "Create a ne comment"
+	content := "Create new comment"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
-	id, err := service.CreateComment(context.Background(), issueid, userid, content)
+	service := NewCommentService(repo, &MockEventPublisher{})
+	id, err := service.CreateComment(context.Background(), issueid, content)
 	saved := repo.comments[id]
 	if err != nil {
 		t.Errorf("got %v,want %v", err, nil)
@@ -75,9 +74,6 @@ func TestCreateNewComment(t *testing.T) {
 		t.Errorf("got %v,want %v", saved.IssueId, issueid)
 	}
 
-	if saved.UserId != userid {
-		t.Errorf("got %v,want %v", saved.UserId, userid)
-	}
 	if saved.Content != content {
 		t.Errorf("got %v,want %v", saved.Content, content)
 	}
@@ -89,7 +85,7 @@ func TestCreateNewComment(t *testing.T) {
 func TestCommentGetById(t *testing.T) {
 	id := "01"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments[id] = domain.Comment{Id: id}
 	comment, err := service.GetById(context.Background(), id)
 	if err != nil {
@@ -106,7 +102,7 @@ func TestCommentGetByIssueId(t *testing.T) {
 	issueid3 := "30"
 
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments["01"] = domain.Comment{Id: "01", IssueId: issueid1}
 	repo.comments["02"] = domain.Comment{Id: "02", IssueId: issueid2}
 	repo.comments["03"] = domain.Comment{Id: "03", IssueId: issueid3}
@@ -134,7 +130,7 @@ func TestCommentGetByUserId(t *testing.T) {
 	userid3 := "30"
 
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments["01"] = domain.Comment{Id: "01", UserId: userid1}
 	repo.comments["02"] = domain.Comment{Id: "02", UserId: userid2}
 	repo.comments["03"] = domain.Comment{Id: "03", UserId: userid3}
@@ -160,7 +156,7 @@ func TestUpdateComment(t *testing.T) {
 	content := "New Comment"
 	id := "1"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments[id] = domain.Comment{Id: id, Content: "old comment"}
 	comment := domain.Comment{Id: id, Content: content}
 	err := service.UpdateComment(context.Background(), comment)
@@ -179,7 +175,7 @@ func TestUpdateComment(t *testing.T) {
 func TestDeleteComment(t *testing.T) {
 	id := "01"
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments[id] = domain.Comment{Id: id, Content: "comment"}
 	comment := domain.Comment{Id: id, Content: "comment"}
 	err := service.DeleteComment(context.Background(), comment)
@@ -197,7 +193,7 @@ func TestDeleteComment(t *testing.T) {
 func TestListComments(t *testing.T) {
 
 	repo := &MockCommentRepository{comments: map[string]domain.Comment{}}
-	service := NewCommentService(repo)
+	service := NewCommentService(repo, &MockEventPublisher{})
 	repo.comments["01"] = domain.Comment{Id: "01", Content: "comment"}
 	repo.comments["02"] = domain.Comment{Id: "02", Content: "comment"}
 	repo.comments["03"] = domain.Comment{Id: "03", Content: "comment"}

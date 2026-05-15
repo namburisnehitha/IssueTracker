@@ -7,8 +7,14 @@ import (
 	"github.com/namburisnehitha/IssueTracker/domain"
 )
 
+type issueLabelKey struct {
+	issueId string
+	labelId string
+}
+
 type MockLabelRepository struct {
-	labels map[string]domain.Label
+	labels      map[string]domain.Label
+	issueLabels map[issueLabelKey]bool
 }
 
 func (m *MockLabelRepository) Save(ctx context.Context, label domain.Label) error {
@@ -57,13 +63,24 @@ func (m *MockLabelRepository) LabelList(ctx context.Context) ([]domain.Label, er
 	}
 	return result, nil
 }
+
+func (m *MockLabelRepository) AddLabelToIssue(ctx context.Context, issueId string, labelId string) error {
+	m.issueLabels[issueLabelKey{issueId, labelId}] = true
+	return nil
+}
+
+func (m *MockLabelRepository) RemoveLabelFromIssue(ctx context.Context, issueId string, labelId string) error {
+	delete(m.issueLabels, issueLabelKey{issueId, labelId})
+	return nil
+}
+
 func TestCreateLabel(t *testing.T) {
 	id := "01"
 	name := "name"
 	description := "description"
 	colour := "colour"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	repo.labels[id] = domain.Label{Id: id, Name: name, Description: description, Colour: colour}
 	id, err := service.CreateLabel(context.Background(), name, description, colour)
 	saved := repo.labels[id]
@@ -92,7 +109,7 @@ func TestCreateLabel(t *testing.T) {
 func TestLabelGetById(t *testing.T) {
 	id := "01"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	repo.labels["01"] = domain.Label{Id: id}
 	label, err := service.GetById(context.Background(), id)
 
@@ -108,7 +125,7 @@ func TestLabelGetByName(t *testing.T) {
 	id := "01"
 	name := "title"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	repo.labels[name] = domain.Label{Id: id, Name: name}
 	label, err := service.GetByName(context.Background(), name)
 
@@ -122,7 +139,7 @@ func TestLabelGetByName(t *testing.T) {
 func TestLabelGetByColour(t *testing.T) {
 	colour := "red"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	var labels []domain.Label
 	repo.labels["01"] = domain.Label{Id: "01", Colour: "red"}
 	repo.labels["02"] = domain.Label{Id: "02", Colour: "pink"}
@@ -146,7 +163,7 @@ func TestLabelGetByColour(t *testing.T) {
 func TestUpdatelabel(t *testing.T) {
 	colour := "newcolour"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	repo.labels["01"] = domain.Label{Id: "01", Colour: "oldcolour"}
 	label := domain.Label{Id: "01", Colour: colour}
 	err := service.UpdateLabel(context.Background(), label)
@@ -165,7 +182,7 @@ func TestDeleteLabel(t *testing.T) {
 
 	id := "01"
 	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	service := NewLabelService(repo, &MockEventPublisher{})
 	repo.labels[id] = domain.Label{Id: id}
 	label := domain.Label{Id: id}
 	err := service.DeleteLabel(context.Background(), label)
@@ -182,8 +199,8 @@ func TestDeleteLabel(t *testing.T) {
 }
 
 func TestListLabels(t *testing.T) {
-	repo := &MockLabelRepository{labels: map[string]domain.Label{}}
-	service := NewLabelService(repo)
+	repo := &MockLabelRepository{labels: map[string]domain.Label{}, issueLabels: map[issueLabelKey]bool{}}
+	service := NewLabelService(repo, &MockEventPublisher{})
 	var labels []domain.Label
 	repo.labels["01"] = domain.Label{Id: "01", Colour: "red"}
 	repo.labels["02"] = domain.Label{Id: "02", Colour: "pink"}
@@ -198,4 +215,45 @@ func TestListLabels(t *testing.T) {
 		t.Errorf("got %v,want %v", err, nil)
 	}
 
+}
+
+func TestAddLabelToIssue(t *testing.T) {
+	issueId := "issue-01"
+	labelId := "label-01"
+	repo := &MockLabelRepository{
+		labels:      map[string]domain.Label{},
+		issueLabels: map[issueLabelKey]bool{},
+	}
+	service := NewLabelService(repo, &MockEventPublisher{})
+
+	err := service.AddLabelToIssue(context.Background(), issueId, labelId)
+
+	if err != nil {
+		t.Errorf("got %v, want %v", err, nil)
+	}
+
+	if !repo.issueLabels[issueLabelKey{issueId, labelId}] {
+		t.Errorf("label was not added to issue")
+	}
+}
+
+func TestRemoveLabelFromIssue(t *testing.T) {
+	issueId := "issue-01"
+	labelId := "label-01"
+	repo := &MockLabelRepository{
+		labels:      map[string]domain.Label{},
+		issueLabels: map[issueLabelKey]bool{},
+	}
+	repo.issueLabels[issueLabelKey{issueId, labelId}] = true
+	service := NewLabelService(repo, &MockEventPublisher{})
+
+	err := service.RemoveLabelFromIssue(context.Background(), issueId, labelId)
+
+	if err != nil {
+		t.Errorf("got %v, want %v", err, nil)
+	}
+
+	if repo.issueLabels[issueLabelKey{issueId, labelId}] {
+		t.Errorf("label was not removed from issue")
+	}
 }

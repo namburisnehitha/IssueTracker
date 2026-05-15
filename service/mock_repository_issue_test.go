@@ -11,6 +11,12 @@ type MockIssueRepository struct {
 	issues map[string]domain.Issue
 }
 
+type MockEventPublisher struct{}
+
+func (m *MockEventPublisher) Publish(ctx context.Context, event domain.DomainEvent) error {
+	return nil
+}
+
 func (m *MockIssueRepository) Save(ctx context.Context, issue domain.Issue) error {
 	m.issues[issue.Id] = issue
 	return nil
@@ -65,7 +71,7 @@ func TestCreateIssue(t *testing.T) {
 	assignee_id := "001"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
 
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 
 	id, err := service.CreateIssue(context.Background(), title, description, assignee_id)
 	saved := repo.issues[id]
@@ -92,7 +98,7 @@ func TestCreateIssue(t *testing.T) {
 func TestIsssueGetById(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues[id] = domain.Issue{Id: id, Title: "test"}
 	issue, err := service.GetById(context.Background(), id)
 
@@ -110,7 +116,7 @@ func TestIssueGetByStatus(t *testing.T) {
 	//only one issue
 	status := domain.StatusOpen
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status}
 	issue, err := service.GetByStatus(context.Background(), status)
 
@@ -127,7 +133,7 @@ func TestIssueGetByStatus(t *testing.T) {
 	status2 := domain.StatusClosed
 	status3 := domain.StatusOpen
 	repo1 := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service1 := NewIssueService(repo1)
+	service1 := NewIssueService(repo1, &MockEventPublisher{})
 	repo1.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: status1}
 	repo1.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: status2}
 	repo1.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: status3}
@@ -150,7 +156,7 @@ func TestIssueGetByTitle(t *testing.T) {
 	//with one issue
 	title := "test"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues["01"] = domain.Issue{Id: "01", Title: title}
 	issue, err := service.GetByTitle(context.Background(), title)
 
@@ -167,7 +173,7 @@ func TestIssueGetByTitle(t *testing.T) {
 	title3 := "test0"
 
 	repo1 := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service1 := NewIssueService(repo1)
+	service1 := NewIssueService(repo1, &MockEventPublisher{})
 	repo1.issues["01"] = domain.Issue{Id: "01", Title: title1}
 	repo1.issues["02"] = domain.Issue{Id: "02", Title: title2}
 	repo1.issues["03"] = domain.Issue{Id: "03", Title: title3}
@@ -189,7 +195,7 @@ func TestIssueGetByTitle(t *testing.T) {
 func TestUpdateIssue(t *testing.T) {
 	title := "new"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "old"}
 	issue := domain.Issue{Id: "01", Title: title}
 	err := service.UpdateIssue(context.Background(), issue)
@@ -206,7 +212,7 @@ func TestUpdateIssue(t *testing.T) {
 func TestDeleteIssue(t *testing.T) {
 	id := "01"
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service := NewIssueService(repo)
+	service := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues[id] = domain.Issue{Id: id}
 	issue := domain.Issue{Id: id}
 	err := service.DeleteIssue(context.Background(), issue)
@@ -224,7 +230,7 @@ func TestDeleteIssue(t *testing.T) {
 
 func TestListIssue(t *testing.T) {
 	repo := &MockIssueRepository{issues: map[string]domain.Issue{}}
-	service1 := NewIssueService(repo)
+	service1 := NewIssueService(repo, &MockEventPublisher{})
 	repo.issues["01"] = domain.Issue{Id: "01", Title: "test", Status: domain.StatusOpen}
 	repo.issues["02"] = domain.Issue{Id: "02", Title: "test", Status: domain.StatusOpen}
 	repo.issues["03"] = domain.Issue{Id: "03", Title: "test", Status: domain.StatusOpen}

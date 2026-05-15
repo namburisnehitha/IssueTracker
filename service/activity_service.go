@@ -64,3 +64,8 @@ func (a *ActivityService) ActivityList(ctx context.Context) ([]domain.Activity, 
 	defer span.End()
 	return a.activityRepository.ActivityList(ctx)
 }
+
+func (a *ActivityService) Publish(ctx context.Context, event domain.DomainEvent) error {
+	_, err := a.CreateActivity(ctx, event.IssueId, event.UserId, event.Description, event.Type)
+	return err
+}

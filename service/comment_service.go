@@ -11,27 +11,45 @@ import (
 
 type CommentService struct {
 	commentRepository domain.CommentRepository
+	publisher         domain.EventPublisher
 	tracer            trace.Tracer
 }
 
-func NewCommentService(commentRepository domain.CommentRepository) *CommentService {
+func NewCommentService(commentRepository domain.CommentRepository, publisher domain.EventPublisher) *CommentService {
 	return &CommentService{
 		commentRepository: commentRepository,
+		publisher:         publisher,
 		tracer:            otel.Tracer("comment-service"),
 	}
 }
 
-func (c *CommentService) CreateComment(ctx context.Context, issueid string, userid string, content string) (string, error) {
+func (c *CommentService) CreateComment(ctx context.Context, issueid string, content string) (string, error) {
+
+	userID := domain.UserIDFromContext(ctx)
 
 	ctx, span := c.tracer.Start(ctx, "CreateComment")
 	defer span.End()
 
 	id := uuid.New().String()
-	comment, err := domain.NewComment(issueid, userid, content, id)
+	comment, err := domain.NewComment(issueid, userID, content, id)
 	if err != nil {
 		return "", err
 	}
-	return id, c.commentRepository.Save(ctx, comment)
+
+	err = c.commentRepository.Save(ctx, comment)
+
+	if err != nil {
+		return "", err
+	}
+
+	c.publisher.Publish(ctx, domain.DomainEvent{
+		Type:        domain.CommentAdded,
+		IssueId:     issueid,
+		UserId:      userID,
+		Description: "create comment",
+	})
+	return id, nil
+
 }
 
 func (c *CommentService) GetByIssueId(ctx context.Context, issueid string) ([]domain.Comment, error) {
@@ -59,9 +77,22 @@ func (c *CommentService) UpdateComment(ctx context.Context, comment domain.Comme
 }
 
 func (c *CommentService) DeleteComment(ctx context.Context, comment domain.Comment) error {
+	userID := domain.UserIDFromContext(ctx)
+
 	ctx, span := c.tracer.Start(ctx, "DeleteComment")
 	defer span.End()
-	return c.commentRepository.DeleteComment(ctx, comment)
+	err := c.commentRepository.DeleteComment(ctx, comment)
+	if err != nil {
+		return err
+	}
+
+	c.publisher.Publish(ctx, domain.DomainEvent{
+		Type:        domain.CommentDeleted,
+		UserId:      userID,
+		IssueId:     comment.IssueId,
+		Description: "delete comment",
+	})
+	return nil
 }
 func (c *CommentService) CommentList(ctx context.Context) ([]domain.Comment, error) {
 	ctx, span := c.tracer.Start(ctx, "CommentList")

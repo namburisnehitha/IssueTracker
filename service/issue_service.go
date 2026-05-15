@@ -11,17 +11,21 @@ import (
 
 type IssueService struct {
 	issueRepository domain.IssueRepository
+	publisher       domain.EventPublisher
 	tracer          trace.Tracer
 }
 
-func NewIssueService(issueRepository domain.IssueRepository) *IssueService {
+func NewIssueService(issueRepository domain.IssueRepository, publisher domain.EventPublisher) *IssueService {
 	return &IssueService{
 		issueRepository: issueRepository,
+		publisher:       publisher,
 		tracer:          otel.Tracer("issue-service"),
 	}
 }
 
 func (i *IssueService) CreateIssue(ctx context.Context, title string, description string, assigneeid string) (string, error) {
+
+	userID := domain.UserIDFromContext(ctx)
 
 	ctx, span := i.tracer.Start(ctx, "CreateIssue")
 	defer span.End()
@@ -32,7 +36,20 @@ func (i *IssueService) CreateIssue(ctx context.Context, title string, descriptio
 		span.RecordError(err)
 		return "", err
 	}
-	return id, i.issueRepository.Save(ctx, issue)
+	err = i.issueRepository.Save(ctx, issue)
+
+	if err != nil {
+		return "", err
+	}
+
+	i.publisher.Publish(ctx, domain.DomainEvent{
+		Type:        domain.IssueCreated,
+		IssueId:     id,
+		UserId:      userID,
+		Description: "issue created",
+	})
+	return id, nil
+
 }
 
 func (i *IssueService) GetById(ctx context.Context, id string) (domain.Issue, error) {
@@ -60,9 +77,24 @@ func (i *IssueService) UpdateIssue(ctx context.Context, issue domain.Issue) erro
 }
 
 func (i *IssueService) DeleteIssue(ctx context.Context, issue domain.Issue) error {
+
+	userID := domain.UserIDFromContext(ctx)
+
 	ctx, span := i.tracer.Start(ctx, "DeleteIssue")
 	defer span.End()
-	return i.issueRepository.DeleteIssue(ctx, issue)
+	err := i.issueRepository.DeleteIssue(ctx, issue)
+
+	if err != nil {
+		return err
+	}
+
+	i.publisher.Publish(ctx, domain.DomainEvent{
+		Type:        domain.IssueDeleted,
+		IssueId:     issue.Id,
+		UserId:      userID,
+		Description: "issue deleted",
+	})
+	return nil
 }
 
 func (i *IssueService) ListIssues(ctx context.Context) ([]domain.Issue, error) {
