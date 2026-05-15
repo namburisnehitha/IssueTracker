@@ -35,6 +35,7 @@ func (ir *PostgresIssueRepository) Save(ctx context.Context, issue domain.Issue)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -53,6 +54,7 @@ func (ir *PostgresIssueRepository) GetById(ctx context.Context, id string) (doma
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return domain.Issue{}, err
 	}
 	return issue, err
@@ -71,6 +73,7 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -80,6 +83,7 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		issues = append(issues, i)
@@ -87,6 +91,7 @@ func (ir *PostgresIssueRepository) GetByTitle(ctx context.Context, title string)
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return issues, err
@@ -105,6 +110,7 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -114,6 +120,7 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		issues = append(issues, i)
@@ -121,6 +128,7 @@ func (ir *PostgresIssueRepository) GetByStatus(ctx context.Context, status domai
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return issues, err
@@ -138,6 +146,7 @@ func (ir *PostgresIssueRepository) UpdateIssue(ctx context.Context, issue domain
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -155,6 +164,7 @@ func (ir *PostgresIssueRepository) DeleteIssue(ctx context.Context, issue domain
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -173,6 +183,7 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -182,6 +193,7 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		issues = append(issues, i)
@@ -189,6 +201,7 @@ func (ir *PostgresIssueRepository) ListIssues(ctx context.Context) ([]domain.Iss
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return issues, err

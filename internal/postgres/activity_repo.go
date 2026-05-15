@@ -36,6 +36,7 @@ func (ar *PostgresActivityRepository) Save(ctx context.Context, activity domain.
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -54,6 +55,7 @@ func (ar *PostgresActivityRepository) GetById(ctx context.Context, id string) (d
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return domain.Activity{}, err
 	}
 	return activity, err
@@ -72,6 +74,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -81,6 +84,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		activities = append(activities, a)
@@ -88,6 +92,7 @@ func (ar *PostgresActivityRepository) GetByUserId(ctx context.Context, userid st
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return activities, err
@@ -106,6 +111,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -115,6 +121,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		activities = append(activities, a)
@@ -122,6 +129,7 @@ func (ar *PostgresActivityRepository) GetByIssueId(ctx context.Context, issueid 
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return activities, err
@@ -140,14 +148,17 @@ func (ar *PostgresActivityRepository) GetByAction(ctx context.Context, action do
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var a domain.Activity
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		activities = append(activities, a)
@@ -155,6 +166,7 @@ func (ar *PostgresActivityRepository) GetByAction(ctx context.Context, action do
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return activities, err
@@ -173,12 +185,14 @@ func (ar *PostgresActivityRepository) ActivityList(ctx context.Context) ([]domai
 		span.RecordError(err)
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var a domain.Activity
 		err := rows.Scan(&a.Id, &a.IssueId, &a.UserId, &a.Description, &a.CreatedAt, &a.Action)
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		activities = append(activities, a)
@@ -186,6 +200,7 @@ func (ar *PostgresActivityRepository) ActivityList(ctx context.Context) ([]domai
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return activities, err

@@ -35,6 +35,7 @@ func (ur *PostgresUsersRepository) Save(ctx context.Context, user domain.User) e
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -52,6 +53,7 @@ func (ur *PostgresUsersRepository) GetById(ctx context.Context, id string) (doma
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return domain.User{}, err
 	}
 	return user, err
@@ -69,6 +71,7 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -78,6 +81,7 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		users = append(users, u)
@@ -85,6 +89,7 @@ func (ur *PostgresUsersRepository) GetByName(ctx context.Context, name string) (
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return users, err
@@ -103,6 +108,7 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -112,6 +118,7 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		users = append(users, u)
@@ -119,6 +126,7 @@ func (ur *PostgresUsersRepository) GetByRole(ctx context.Context, role domain.Ro
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return users, err
@@ -136,6 +144,7 @@ func (ur *PostgresUsersRepository) UpdateUser(ctx context.Context, user domain.U
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -152,6 +161,7 @@ func (ur *PostgresUsersRepository) DeleteUser(ctx context.Context, user domain.U
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return err
 	}
 	return err
@@ -169,6 +179,7 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	defer rows.Close()
@@ -178,6 +189,7 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 		if err != nil {
 			span.RecordError(err)
 			span.SetStatus(codes.Error, err.Error())
+			span.SetStatus(codes.Ok, "")
 			return nil, err
 		}
 		users = append(users, u)
@@ -185,6 +197,7 @@ func (ur *PostgresUsersRepository) UserList(ctx context.Context) ([]domain.User,
 	if err := rows.Err(); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return nil, err
 	}
 	return users, err
@@ -202,6 +215,7 @@ func (ur *PostgresUsersRepository) GetByUserName(ctx context.Context, username s
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
+		span.SetStatus(codes.Ok, "")
 		return domain.User{}, err
 	}
 	return user, err

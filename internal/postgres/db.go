@@ -10,11 +10,10 @@ import (
 
 func NewDB(ConnString string) (*sql.DB, error) {
 
-	db, err := otelsql.Open("postgres", ConnString)
-	otelsql.WithAttributes(semconv.DBSystemPostgreSQL)
+	db, err := otelsql.Open("postgres", ConnString, otelsql.WithAttributes(semconv.DBSystemPostgreSQL))
 
 	if err != nil {
-		return nil, err
+		return nil, sql.ErrNoRows
 	}
 
 	err = db.Ping()
