@@ -20,6 +20,8 @@ type LabelRepository interface {
 	UpdateLabel(ctx context.Context, label Label) error
 	DeleteLabel(ctx context.Context, label Label) error
 	LabelList(ctx context.Context) ([]Label, error)
+	AddLabelToIssue(ctx context.Context, issueId string, labelId string) error
+	RemoveLabelFromIssue(ctx context.Context, issueId string, labelId string) error
 }
 
 type CommentRepository interface {
