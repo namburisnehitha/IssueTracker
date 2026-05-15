@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -83,14 +84,14 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenString := strings.TrimPrefix(authToken, "Bearer ")
-		_, err := ValidateToken(tokenString)
+		userID, err := ValidateToken(tokenString)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(r.Context(), domain.UserIDKey, userID)
+		next.ServeHTTP(w, r.WithContext(ctx))
 
 	}
 	return http.HandlerFunc(fn)
