@@ -41,7 +41,7 @@ func (l *LabelService) CreateLabel(ctx context.Context, name string, description
 	}
 
 	l.publisher.Publish(ctx, domain.DomainEvent{
-		Type:        domain.CommentAdded,
+		Type:        domain.LabelAdded,
 		UserId:      userID,
 		Description: "create label",
 	})
