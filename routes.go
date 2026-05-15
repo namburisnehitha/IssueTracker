@@ -41,6 +41,8 @@ func SetUpRoutes(
 		r.Get("/labels/{id}", labelHandler.GetById)
 		r.Put("/labels/{id}", labelHandler.UpdateLabel)
 		r.Delete("/labels/{id}", labelHandler.DeleteLabel)
+		r.Post("/issues/{id}/labels", labelHandler.AddLabelToIssue)
+		r.Delete("/issues/{id}/labels/{labelId}", labelHandler.RemoveLabelFromIssue)
 
 		r.Get("/comments", commentHandler.GetComment)
 		r.Post("/comments", commentHandler.CreateComment)
@@ -49,7 +51,7 @@ func SetUpRoutes(
 		r.Delete("/comments/{id}", commentHandler.DeleteComment)
 
 		r.Get("/activities", activityHandler.GetActivity)
-		r.Post("/activities", activityHandler.CreateNewActivity)
+		r.Get("/activities/{id}", activityHandler.GetById)
 	})
 
 	r.Post("/login", authHandler.Login)

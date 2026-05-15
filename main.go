@@ -32,8 +32,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	activityrepo := postgres.NewPostgresActivityRepository(db)
+	activityservice := service.NewActivityService(activityrepo)
+	activityhandler := handlers.NewActivityHandler(activityservice)
+
 	issuerepo := postgres.NewPostgresIssueRepository(db)
-	issueservice := service.NewIssueService(issuerepo)
+	issueservice := service.NewIssueService(issuerepo, activityservice)
 	issuehandler := handlers.NewIssueHandler(issueservice)
 
 	userrepo := postgres.NewPostgresUserRepository(db)
@@ -41,16 +45,12 @@ func main() {
 	userhandler := handlers.NewUserHandler(userservice)
 
 	labelrepo := postgres.NewPostgresLabelRepository(db)
-	labelservice := service.NewLabelService(labelrepo)
+	labelservice := service.NewLabelService(labelrepo, activityservice)
 	labelhandler := handlers.NewLabelHandler(labelservice)
 
 	commentrepo := postgres.NewPostgresCommentRepository(db)
-	commentservice := service.NewCommentService(commentrepo)
+	commentservice := service.NewCommentService(commentrepo, activityservice)
 	commenthandler := handlers.NewCommentHandler(commentservice)
-
-	activityrepo := postgres.NewPostgresActivityRepository(db)
-	activityservice := service.NewActivityService(activityrepo)
-	activityhandler := handlers.NewActivityHandler(activityservice)
 
 	authHandler := handlers.NewAuthHandler(userservice)
 
@@ -90,6 +90,8 @@ func main() {
 	fmt.Println("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	server.Shutdown(ctx)
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("server shutdown error: %v", err)
+	}
 
 }
