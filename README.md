@@ -107,11 +107,7 @@ All transitions are validated in the domain layer and return typed domain errors
 
 ## Tests
 
-Domain logic is fully tested — every state transition, authorization check, and error case has explicit coverage.
-
-```bash
-go test ./...
----
+Domain logic is fully tested — every state transition, authorization check, and error case has explicit coverage
 
 ## OpenTelemetry Observability
 
