@@ -58,19 +58,19 @@ Each layer only depends inward — handlers know about services, services know a
 ### Dependency Flow
 
 ```
-HTTP Request
-  
-MetricsMiddleware (starts span, records metrics)
+1.HTTP Request
     
-JWTMiddleware (injects userID into context)
+2.MetricsMiddleware (starts span, records metrics)
+    
+3.JWTMiddleware (injects userID into context)
 
-Handler (decodes request body)
+4.Handler (decodes request body)
 
-Service (domain logic + publishes event)
+5.Service (domain logic + publishes event)
 
-Repository (SQL query with OTel span)
+6.Repository (SQL query with OTel span)
 
-ActivityService.Publish (auto-creates audit record)
+7.ActivityService.Publish (auto-creates audit record)
 ```
 
 ---
@@ -123,7 +123,7 @@ http.request (middleware)
         └── CreateIssue (issue-service)
               └── CreateIssue (postgres-issue-repo)  ← DB query span with SQL text
               └── CreateActivity (activity-service)   ← event span
-                    └── Createactivity (postgres-activity-repo)
+                    └── CreateActivity (postgres-activity-repo)
 ```
 
 Spans include:
@@ -135,7 +135,7 @@ Spans include:
 
 Traces are exported to **Jaeger** via OTLP/gRPC.
 
-### Traces
+
 ![Jaeger trace](IssueTracker-jaeger.png)
 
 ### Metrics
