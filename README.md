@@ -4,7 +4,7 @@ A production-quality issue tracking REST API built in Go, demonstrating clean Do
 
 ## Why I Built This
 
-Built to develop the kind of deep understanding where I can walk into any production codebase and it starts making sense— the architecture decisions, the tradeoffs, the failure modes. OpenTelemetry was the natural next layer: once you understand how a system is built, you want to see inside it while it runs. That curiosity led me to the CNCF ecosystem and the OpenTelemetry Go compile instrumentation project.
+Built to develop the kind of deep understanding where I can walk into any production codebase and it starts making sense— the architecture decisions, the tradeoffs, the failure modes.
 
 ## Table of Contents
 
