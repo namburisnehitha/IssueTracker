@@ -59,17 +59,17 @@ Each layer only depends inward — handlers know about services, services know a
 
 ```
 HTTP Request
-    ↓
-JWTMiddleware (injects userID into context)
-    ↓
+  
 MetricsMiddleware (starts span, records metrics)
-    ↓
+    
+JWTMiddleware (injects userID into context)
+
 Handler (decodes request body)
-    ↓
+
 Service (domain logic + publishes event)
-    ↓
+
 Repository (SQL query with OTel span)
-    ↓
+
 ActivityService.Publish (auto-creates audit record)
 ```
 
