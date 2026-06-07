@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/namburisnehitha/IssueTracker/handlers"
@@ -58,5 +59,12 @@ func SetUpRoutes(
 	r.Post("/users", userHandler.CreateUser)
 	r.Handle("/metrics", promhttp.Handler())
 
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status": "ok"}`))
+	})
+
 	return r
+
 }
